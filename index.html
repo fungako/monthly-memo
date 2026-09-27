@@ -1,1552 +1,341 @@
 <!DOCTYPE html>
+
 <html lang="zh-HK">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Monthly Memo</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐰</text></svg>">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#ffffff">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  
-  <script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>My Monthly Memo — Diary Edition</title>
+<link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;🐰&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
+<link href="manifest.json" rel="manifest"/>
+<meta content="#F7F2E8" name="theme-color"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Nunito:wght@400;600;700;800;900&amp;family=Noto+Sans+TC:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['"Nunito"', '"Noto Sans TC"', 'sans-serif'],
-          },
-          colors: {
-            memo: {
-              bg: '#f8fafc',
-              card: '#ffffff',
-              border: '#475569',
-              text: '#334155',
-              muted: '#94a3b8'
-            }
-          }
+          fontFamily: { sans: ['"Nunito"', '"Noto Sans TC"', 'sans-serif'], mono: ['"DM Mono"','monospace'] },
+          colors: { memo: { bg:'#F7F2E8', card:'#FFFDF8', border:'#5A5048', text:'#39332F', muted:'#8F8278' } }
         }
       }
     }
   </script>
-  <style>
-    body {
-      background-color: #f8fafc;
-      background-image: 
-        linear-gradient(to right, #e2e8f0 1px, transparent 1px),
-        linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
-      background-size: 24px 24px;
-      color: #334155;
+<style>
+    :root{
+      --paper:#F7F2E8;--paper-2:#FFFDF8;--paper-3:#F1E9DC;--ink:#39332F;--muted:#8F8278;
+      --line:#B9AA9E;--deep:#5A5048;--butter:#E9DDA9;--blush:#D9AEA8;--sage:#AEB9A4;
+      --blue:#AABBC8;--coral:#C98778;--shadow:rgba(90,80,72,.18);--grid:rgba(90,80,72,.075);
+      --success:#70866B;--warning:#B47A54;
     }
-    .memo-card {
-      background: #ffffff;
-      border: 3px solid #475569;
-      box-shadow: 6px 6px 0px 0px #475569;
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    html[data-theme="night"]{
+      --paper:#191816;--paper-2:#24211E;--paper-3:#2D2925;--ink:#F4EFE6;--muted:#B9ADA2;
+      --line:#655E57;--deep:#E8DDCF;--butter:#766C45;--blush:#765C59;--sage:#53604F;
+      --blue:#53636E;--coral:#80564C;--shadow:rgba(0,0,0,.34);--grid:rgba(255,255,255,.045);
+      --success:#A6B89E;--warning:#D39A76;
     }
-    .memo-btn {
-      background: #ffffff;
-      border: 3px solid #475569;
-      box-shadow: 4px 4px 0px 0px #475569;
-      color: #334155;
-      font-weight: 800;
-      transition: all 0.15s ease;
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:104px}
+    body{
+      background-color:var(--paper);color:var(--ink);
+      background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);
+      background-size:28px 28px;
+      transition:background-color .25s,color .25s;
     }
-    .memo-btn:hover {
-      background: #475569;
-      color: #ffffff;
-    }
-    .memo-btn:active {
-      transform: translate(4px, 4px);
-      box-shadow: 0px 0px 0px 0px #475569;
-    }
-    .memo-bar-bg {
-      background: #f1f5f9;
-      border: 2px solid #475569;
-      height: 20px;
-    }
-    .memo-bar-fill {
-      height: 100%;
-      background: #475569;
-      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .bar-warning {
-      background: repeating-linear-gradient(
-        45deg,
-        #475569,
-        #475569 10px,
-        #94a3b8 10px,
-        #94a3b8 20px
-      );
-    }
-    .no-arrow {
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-    }
-    input[type="checkbox"] {
-      accent-color: #475569;
-    }
-    .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; border-left: 2px solid #94a3b8; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
+    ::selection{background:var(--butter);color:var(--ink)}
+    .app-header{background:color-mix(in srgb,var(--paper-2) 92%,transparent);border-bottom:1.5px solid var(--line);backdrop-filter:blur(16px);box-shadow:0 8px 22px rgba(70,58,48,.06)}
+    .brand-stamp{width:42px;height:42px;border:1.5px solid var(--deep);background:var(--paper-2);display:flex;align-items:center;justify-content:center;border-radius:12px;box-shadow:3px 3px 0 var(--butter);transform:rotate(-2deg)}
+    .brand-chip{background:var(--ink);color:var(--paper-2);padding:.12rem .42rem;border-radius:6px}
+    .top-nav-btn{font-size:.72rem;font-weight:900;color:var(--muted);padding:.55rem .7rem;border-radius:999px;transition:.15s;white-space:nowrap}
+    .top-nav-btn:hover{background:var(--paper-3);color:var(--ink)}
+    .memo-card{background:var(--paper-2);border:1.5px solid var(--line);border-radius:18px;box-shadow:0 8px 24px var(--shadow)}
+    .paper-card{position:relative;background:var(--paper-2);border:1.5px solid var(--line);border-radius:18px;box-shadow:0 8px 24px var(--shadow)}
+    .paper-card:before{content:"";position:absolute;inset:7px;border:1px dashed color-mix(in srgb,var(--line) 45%,transparent);border-radius:12px;pointer-events:none;opacity:.45}
+    .memo-btn{background:var(--paper-2);border:1.5px solid var(--deep);border-radius:11px;box-shadow:3px 3px 0 color-mix(in srgb,var(--deep) 55%,transparent);color:var(--ink);font-weight:900;transition:.15s}
+    .memo-btn:hover{background:var(--ink);color:var(--paper-2);transform:translateY(-1px)}
+    .memo-btn:active{transform:translate(2px,2px);box-shadow:none}
+    .memo-input{width:100%;background:var(--paper-2)!important;color:var(--ink)!important;border:1.5px solid var(--line)!important;border-radius:12px;padding:.72rem .9rem;font-weight:800;outline:none;box-shadow:none!important;transition:.15s}
+    .memo-input:focus{border-color:var(--deep)!important;box-shadow:0 0 0 3px color-mix(in srgb,var(--butter) 55%,transparent)!important}
+    .memo-input::placeholder{color:var(--muted);opacity:.72}
+    select option{background:var(--paper-2);color:var(--ink)}
+    .mini-label{font-family:"DM Mono",monospace;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+    .section-kicker{font-family:"DM Mono",monospace;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+    .hero-shell{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--paper-2) 0%,color-mix(in srgb,var(--butter) 28%,var(--paper-2)) 100%);border:1.5px solid var(--line);border-radius:26px;box-shadow:0 16px 40px var(--shadow)}
+    .hero-shell:after{content:"MONTHLY / MONEY / MEMO";position:absolute;right:-20px;bottom:10px;font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.28em;color:var(--line);transform:rotate(-90deg);transform-origin:right bottom;opacity:.5}
+    .hero-number{font-size:clamp(2.6rem,8vw,5.35rem);line-height:.92;letter-spacing:-.065em;font-weight:900}
+    .hero-fund{background:color-mix(in srgb,var(--blush) 28%,var(--paper-2));border:1.5px solid var(--line);border-radius:18px;position:relative;overflow:hidden}
+    .hero-fund:after{content:"✦";position:absolute;right:15px;top:7px;font-size:40px;color:color-mix(in srgb,var(--blush) 55%,transparent);transform:rotate(15deg)}
+    .sticky-note{background:color-mix(in srgb,var(--butter) 60%,var(--paper-2));border:1px solid color-mix(in srgb,var(--line) 75%,transparent);border-radius:5px 14px 6px 11px;box-shadow:4px 6px 14px var(--shadow);transform:rotate(-1deg);position:relative}
+    .sticky-note:before{content:"";position:absolute;width:70px;height:18px;background:rgba(255,255,255,.42);top:-9px;left:38%;transform:rotate(2deg);border:1px solid rgba(150,130,100,.08)}
+    .budget-envelope{position:relative;overflow:hidden;min-height:180px;background:var(--paper-2);border:1.5px solid var(--line);border-radius:18px;padding:1.2rem;box-shadow:0 6px 18px var(--shadow)}
+    .budget-envelope:after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;right:-38px;bottom:-42px;background:var(--tone);opacity:.33}
+    .budget-envelope.basic{--tone:var(--sage)}.budget-envelope.fun{--tone:var(--blush)}.budget-envelope.flex{--tone:var(--blue)}.budget-envelope.urgent{--tone:var(--butter)}
+    .memo-bar-bg{background:color-mix(in srgb,var(--line) 12%,transparent);border:0;height:11px;overflow:hidden;border-radius:999px}
+    .memo-bar-fill{height:100%;background:var(--ink);transition:width .45s ease;border-radius:999px}
+    .bar-warning{background:repeating-linear-gradient(45deg,var(--coral),var(--coral) 8px,color-mix(in srgb,var(--coral) 50%,var(--paper-2)) 8px,color-mix(in srgb,var(--coral) 50%,var(--paper-2)) 16px)!important}
+    .metric-card{background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:1.15rem;box-shadow:0 5px 16px var(--shadow)}
+    .metric-card:nth-child(2){background:color-mix(in srgb,var(--sage) 18%,var(--paper-2))}
+    .forecast-ticket{background:var(--paper-2);border:1.5px solid var(--line);border-radius:18px;position:relative;overflow:hidden;box-shadow:0 8px 20px var(--shadow)}
+    .forecast-ticket:before,.forecast-ticket:after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:var(--paper);top:50%;transform:translateY(-50%);border:1px solid var(--line)}
+    .forecast-ticket:before{left:-12px}.forecast-ticket:after{right:-12px}
+    .forecast-ticket .ticket-rule{border-top:1.5px dashed var(--line)}
+    .safe-card{background:color-mix(in srgb,var(--sage) 25%,var(--paper-2));border:1.5px solid var(--line);border-radius:18px;box-shadow:0 8px 20px var(--shadow)}
+    .quick-card{background:color-mix(in srgb,var(--blue) 17%,var(--paper-2));border:1.5px solid var(--line);border-radius:18px;box-shadow:0 8px 20px var(--shadow)}
+    .chart-row{display:grid;grid-template-columns:minmax(72px,130px) 1fr auto;align-items:center;gap:.85rem}
+    .chart-track{height:10px;background:color-mix(in srgb,var(--line) 15%,transparent);border-radius:999px;overflow:hidden}
+    .chart-fill{height:100%;border-radius:999px;background:var(--sage)}
+    .chart-tone-1{background:var(--blush)}.chart-tone-2{background:var(--blue)}.chart-tone-3{background:var(--butter)}.chart-tone-4{background:var(--coral)}
+    .entry-card{background:linear-gradient(180deg,var(--paper-2),color-mix(in srgb,var(--paper-3) 42%,var(--paper-2)))}
+    .amount-field:focus-within{box-shadow:0 0 0 4px color-mix(in srgb,var(--butter) 50%,transparent)}
+    .report-highlight{background:color-mix(in srgb,var(--blush) 22%,var(--paper-2))}
+    .type-btn.active{background:var(--ink)!important;color:var(--paper-2)!important;border-color:var(--ink)!important}
+    .filter-btn{box-shadow:none!important;border-color:var(--line)!important}.filter-btn.bg-memo-border{background:var(--ink)!important;color:var(--paper-2)!important;border-color:var(--ink)!important}
+    .tx-row{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;transition:.15s}
+    .tx-row:hover{transform:translateY(-1px);box-shadow:0 7px 18px var(--shadow)}
+    .tx-icon{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line)}
+    .tx-expense .tx-icon{background:color-mix(in srgb,var(--blush) 35%,var(--paper-2))}.tx-income .tx-icon{background:color-mix(in srgb,var(--sage) 38%,var(--paper-2))}.tx-saving .tx-icon{background:color-mix(in srgb,var(--blue) 32%,var(--paper-2))}.tx-fixed .tx-icon{background:color-mix(in srgb,var(--butter) 45%,var(--paper-2))}
+    .receipt-item{position:relative;background:var(--paper-2);border:1.5px solid var(--line);border-radius:3px 3px 12px 12px;padding:1.1rem;box-shadow:0 6px 16px var(--shadow)}
+    .receipt-item:before{content:"";position:absolute;left:0;right:0;top:-6px;height:7px;background:linear-gradient(135deg,transparent 5px,var(--paper-2) 0) 0 0/10px 7px repeat-x}
+    .receipt-progress{height:8px;border-radius:999px;background:color-mix(in srgb,var(--line) 18%,transparent);overflow:hidden}.receipt-progress>span{display:block;height:100%;background:var(--blush);border-radius:999px}
+    .saved-stamp{display:inline-block;border:2px solid var(--success);color:var(--success);padding:.2rem .5rem;border-radius:5px;font-family:"DM Mono",monospace;letter-spacing:.08em;transform:rotate(-3deg)}
+    .report-sheet{background:var(--paper-2);border:1.5px solid var(--line);border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.22)}
+    .report-stat{background:var(--paper-3);border:1px solid var(--line);border-radius:14px;padding:.9rem}
+    .report-table table{border-collapse:separate!important;border-spacing:0 6px!important}.report-table th{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.report-table th,.report-table td{border:0!important;padding:.65rem!important}.report-table tbody tr{background:var(--paper-3)}.report-table td:first-child{border-radius:10px 0 0 10px}.report-table td:last-child{border-radius:0 10px 10px 0}
+    .floating-bottom-nav{background:color-mix(in srgb,var(--paper-2) 94%,transparent);backdrop-filter:blur(16px);border:1px solid var(--line);box-shadow:0 10px 32px rgba(0,0,0,.18)}
+    .bottom-nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;font-weight:900;color:var(--muted);min-width:54px;height:48px;border-radius:12px}.bottom-nav-btn:hover{background:var(--paper-3);color:var(--ink)}
+    .bottom-add{width:50px;height:50px;margin-top:-18px;background:var(--ink);color:var(--paper-2);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.22);border:4px solid var(--paper)}
+    .tag-pill{border:1px solid var(--line);border-radius:999px;padding:.18rem .48rem;background:var(--paper-3)}
+    .no-arrow{-webkit-appearance:none;-moz-appearance:none;appearance:none}.custom-scrollbar::-webkit-scrollbar{width:7px}.custom-scrollbar::-webkit-scrollbar-track{background:transparent}.custom-scrollbar::-webkit-scrollbar-thumb{background:var(--line);border-radius:10px}
+    input[type=checkbox]{accent-color:var(--ink)}
+    .toast{animation:toastIn .2s ease-out;background:var(--ink)!important;color:var(--paper-2)!important;border:0!important;border-radius:14px!important;box-shadow:0 10px 30px rgba(0,0,0,.2)!important}@keyframes toastIn{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .bg-white{background-color:var(--paper-2)!important}.bg-slate-100,.bg-slate-50{background-color:var(--paper-3)!important}.text-memo-text{color:var(--ink)!important}.text-memo-muted,.text-slate-400,.text-slate-500{color:var(--muted)!important}.border-memo-border,.border-slate-300{border-color:var(--line)!important}.bg-memo-border{background-color:var(--ink)!important}.text-white{color:var(--paper-2)!important}
+    @media(max-width:767px){body{padding-bottom:92px!important}.hero-shell{border-radius:20px}.hero-number{font-size:3rem}.chart-row{grid-template-columns:70px 1fr;gap:.6rem}.chart-row .chart-amount{grid-column:2;text-align:left!important;font-size:11px}.memo-card{border-radius:15px}#toast-container{bottom:88px!important}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+  
+    @media(max-width:767px){#btn-open-entry{top:82px;right:12px;padding:.65rem .8rem}#btn-open-entry span{display:none}#entry-modal .entry-card{border-radius:18px}}
   </style>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('memo_theme')||'day'}catch(e){}</script>
 </head>
-<body class="min-h-screen pb-16 antialiased selection:bg-memo-border selection:text-white">
-
-  <!-- 頂部導航欄 -->
-  <header class="bg-white border-b-[3px] border-memo-border sticky top-0 z-30 shadow-[0_4px_0_0_#475569]">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 bg-white border-[3px] border-memo-border flex items-center justify-center text-memo-text shadow-[2px_2px_0_0_#475569]">
-          <i data-lucide="bookmark" class="w-5 h-5 font-black"></i>
-        </div>
-        <div>
-          <h1 class="font-black text-lg tracking-tight uppercase text-memo-text">My Monthly <span class="bg-memo-border text-white px-1.5 py-0.5 ml-0.5">Memo</span></h1>
-          <div class="flex items-center space-x-1.5 text-xs text-memo-muted font-bold">
-            <span id="sync-indicator" class="w-2.5 h-2.5 bg-white border-2 border-memo-border inline-block"></span>
-            <span id="sync-status">雲端同步中...</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-center space-x-3">
-        <div class="hidden sm:flex relative group cursor-pointer border-b-2 border-memo-border pb-0.5">
-          <div class="flex items-center space-x-2 text-sm font-black text-memo-text">
-            <i data-lucide="calendar-days" class="w-4 h-4"></i>
-            <span>Date:</span>
-            <select id="month-selector" class="bg-transparent outline-none font-black cursor-pointer no-arrow pr-1 text-memo-text">
-            </select>
-            <i data-lucide="chevron-down" class="w-3 h-3"></i>
-          </div>
-        </div>
-
-        <div class="hidden sm:flex items-center space-x-2 text-xs font-black bg-white px-3 py-1.5 border-[2px] border-memo-border shadow-[2px_2px_0_0_#475569] text-memo-text">
-          <i data-lucide="plane" class="w-3.5 h-3.5"></i>
-          <span>1K KRW ≈ <strong id="rate-krw-text">5.60 HKD</strong></span>
-        </div>
-        <button id="btn-open-settings" class="memo-btn px-3 py-1.5 text-xs flex items-center space-x-1.5">
-          <i data-lucide="database" class="w-3.5 h-3.5"></i>
-          <span class="hidden sm:inline">設定 API</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- 主內容容器 -->
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-8 space-y-8">
-
-   <!-- 跨月結餘掉落 -->
-    <div id="rollover-alert" class="hidden memo-card p-6 bg-white relative overflow-hidden">
-      <!-- 🆕 新增：關閉按鈕 (X) -->
-      <button id="btn-close-rollover" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition-colors p-1" title="略過獎勵">
-        <i data-lucide="x" class="w-5 h-5"></i>
-      </button>
-
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pr-6">
-        <div class="flex items-start space-x-4">
-          <div class="w-12 h-12 bg-white text-memo-text border-[3px] border-memo-border flex items-center justify-center shrink-0 shadow-[2px_2px_0_0_#475569]">
-            <i data-lucide="heart-handshake" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-black uppercase tracking-wide text-memo-text">📝 忍手成功嘅獎勵！</h3>
-            <!-- 🆕 修改：變成可編輯的數字輸入框 -->
-            <div class="flex items-center space-x-2 mt-1">
-              <p class="text-sm font-bold text-memo-muted">上月【娛樂與購物】慳返</p>
-              <div class="flex items-center">
-                <span class="text-sm font-bold text-memo-text mr-1">HK$</span>
-                <input type="number" id="rollover-amount-input" class="w-24 bg-slate-50 border-b-2 border-memo-border px-1 py-0.5 text-lg font-black outline-none text-memo-text focus:bg-white transition-colors" value="0">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="flex space-x-3">
-          <button id="btn-claim-gacha" class="memo-btn px-4 py-2.5 text-xs">
-            👉 及時行樂 (加到本月)！
-          </button>
-          <button id="btn-claim-base" class="memo-btn px-4 py-2.5 text-xs bg-memo-border text-white hover:bg-white hover:text-memo-text">
-            👉 直接入落追星基金！
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 1. 動態資源槽 -->
-    <div class="memo-card p-6">
-      <div class="sm:hidden mb-4 border-b-[3px] border-memo-border pb-3">
-        <div class="flex items-center space-x-2 text-base font-black text-memo-text">
-          <i data-lucide="calendar-days" class="w-5 h-5"></i>
-          <span>Date:</span>
-          <select id="month-selector-mobile" class="bg-transparent outline-none font-black cursor-pointer flex-1">
-          </select>
-        </div>
-      </div>
-
-      <h2 class="text-xl font-black mb-1 uppercase tracking-tight flex items-center text-memo-text">
-        <i data-lucide="alert-triangle" class="w-6 h-6 mr-2"></i> 
-        🚨 警告：洗多一蚊，見少一次金容仙！
-      </h2>
-      <p class="text-sm font-bold text-memo-muted mb-6">（備註：飲少杯廢水，買少件垃圾，脂肪少咗，簽售機會多咗，理智消費啊 Ching！）</p>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <div class="flex justify-between items-end mb-2">
-            <span class="text-sm font-black uppercase text-memo-text">🥪 基本與固定開支 (40%)</span>
-            <span id="basic-status-text" class="text-xs font-bold text-memo-muted">載入中...</span>
-          </div>
-          <div class="memo-bar-bg mb-2">
-            <div id="basic-bar" class="memo-bar-fill w-0"></div>
-          </div>
-          <div class="text-right text-xs font-black text-memo-text" id="basic-ratio">0 / 7,200 HKD</div>
-        </div>
-
-        <div>
-          <div class="flex justify-between items-end mb-2">
-            <span class="text-sm font-black uppercase text-memo-text">✨ 娛樂與購物 (25%)</span>
-            <span id="gacha-status-text" class="text-xs font-bold text-memo-muted">載入中...</span>
-          </div>
-          <div class="memo-bar-bg mb-2">
-            <div id="gacha-bar" class="memo-bar-fill w-0"></div>
-          </div>
-          <div class="text-right text-xs font-black text-memo-text" id="gacha-ratio">0 / 4,500 HKD</div>
-        </div>
-
-        <!-- 3. 彈性儲蓄 (20%) -->
-        <div>
-          <div class="flex justify-between items-end mb-2">
-            <span class="text-sm font-black uppercase text-memo-text">✈️ 彈性儲蓄 (20%)</span>
-            <span id="flex-status-text" class="text-xs font-bold text-memo-muted">載入中...</span>
-          </div>
-          <div class="memo-bar-bg mb-2">
-            <div id="flex-bar" class="memo-bar-fill w-0 bg-slate-400"></div>
-          </div>
-          <div class="text-right text-xs font-black text-memo-text" id="flex-ratio">0 / 3,600 HKD</div>
-        </div>
-
-        <!-- 4. 緊急備用金 (15%) -->
-        <div>
-          <div class="flex justify-between items-end mb-2">
-            <span class="text-sm font-black uppercase text-memo-text">🚑 緊急備用金 (15%)</span>
-            <span id="urgent-status-text" class="text-xs font-bold text-memo-muted">載入中...</span>
-          </div>
-          <div class="memo-bar-bg mb-2">
-            <div id="urgent-bar" class="memo-bar-fill w-0 bg-slate-700"></div>
-          </div>
-          <div class="text-right text-xs font-black text-memo-text" id="urgent-ratio">0 / 2,700 HKD</div>
-        </div>
-        
-      </div>
-    </div>
-
-    <div class="memo-card p-4 flex items-start space-x-3 border-dashed">
-          <div class="text-2xl">🐰</div>
-          <div>
-            <h4 class="text-xs font-black uppercase text-memo-muted mb-1">📝 容仙碎碎念</h4>
-            <p class="text-sm font-bold text-memo-text" id="solar-quote">「木木啊～今天有好好吃飯嗎？🍚✨」</p>
-          </div>
-        </div>
-    
-    <!-- 2. 數據卡片 -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-      <div class="memo-card p-5">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-sm font-black uppercase text-memo-text">💸 本月支出</span>
-          <i data-lucide="receipt" class="w-5 h-5 text-memo-muted"></i>
-        </div>
-        <div class="text-3xl font-black mb-4 tracking-tighter text-memo-text" id="stat-expense">HK$ 0.00</div>
-        <div class="text-xs font-bold px-3 py-2 bg-white border-[2px] border-memo-border shadow-[2px_2px_0_0_#475569] inline-block text-memo-text" id="mom-expense-text">戰報分析中...</div>
-      </div>
-
-      <div class="memo-card p-5 bg-slate-100">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-sm font-black uppercase text-memo-text">💰 未來儲備</span>
-          <i data-lucide="ticket" class="w-5 h-5 text-memo-muted"></i>
-        </div>
-        <div class="text-3xl font-black mb-4 tracking-tighter text-memo-text" id="stat-saving">HK$ 0.00</div>
-        <div class="text-xs font-bold px-3 py-2 bg-white border-[2px] border-memo-border shadow-[2px_2px_0_0_#475569] inline-block text-memo-text" id="mom-saving-text">戰報分析中...</div>
-      </div>
-
-     <div class="memo-card p-5">
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-sm font-black uppercase text-memo-text">🥪 本月可用餘額</span>
-          <!-- 🆕 新增：隱藏/顯示 眼睛按鈕 (取代原本個豬仔錢箱) -->
-          <button id="btn-toggle-balance" class="text-memo-muted hover:text-memo-text transition-colors cursor-pointer p-1 rounded" title="顯示/隱藏金額">
-            <i data-lucide="eye" id="icon-eye" class="w-5 h-5"></i>
-            <i data-lucide="eye-off" id="icon-eye-off" class="w-5 h-5 hidden"></i>
-          </button>
-        </div>
-        <div class="text-3xl font-black mb-4 tracking-tighter text-memo-text" id="stat-balance">HK$ 0.00</div>
-        <div class="text-xs font-bold text-memo-muted">
-          打工血汗錢：<span id="stat-income" class="text-memo-text">HK$ 0.00</span>
-        </div>
-      </div>
-     </div>
-
-    <!-- 3. 操作區塊 -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      <div class="lg:col-span-5 space-y-6">
-        <div class="memo-card p-6">
-          <h2 class="text-xl font-black mb-6 uppercase tracking-tight border-b-[3px] border-memo-border pb-3 text-memo-text">
-            ✏️ 新增手帳紀錄
-          </h2>
-
-          <form id="tx-form" class="space-y-5">
-            <div>
-              <label class="block text-sm font-black mb-2 uppercase text-memo-text">類型</label>
-              <!-- 變成 2x2 網格，獨立出固定支出 -->
-              <div class="grid grid-cols-2 gap-3">
-                <button type="button" data-type="expense" class="type-btn active memo-btn py-3 text-sm">
-                  💸 日常支出
-                </button>
-                <button type="button" data-type="fixed" class="type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none hover:bg-slate-200 hover:text-black">
-                  📌 固定支出
-                </button>
-                <button type="button" data-type="income" class="type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none hover:bg-slate-200 hover:text-black">
-                  💰 入帳
-                </button>
-                <button type="button" data-type="saving" class="type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none hover:bg-slate-200 hover:text-black">
-                  🐷 儲蓄
-                </button>
-              </div>
-              <input type="hidden" id="tx-type" value="expense">
-            </div>
-
-            <!-- (原本的 tx-currency 和 tx-amount 金額區塊保留不變...) -->
-            <!-- ⚠️ 注意：原本的 <div id="fixed-expense-container">...</div> 整個刪除！ -->
-
-            <div>
-              <label class="block text-sm font-black mb-2 uppercase text-memo-text">金額與幣別</label>
-              <div class="flex border-[3px] border-memo-border bg-white shadow-[4px_4px_0_0_#475569] focus-within:translate-x-[2px] focus-within:translate-y-[2px] focus-within:shadow-[2px_2px_0_0_#475569] transition-all">
-                <select id="tx-currency" class="bg-slate-100 text-memo-text text-sm font-black px-4 py-3 outline-none border-r-[3px] border-memo-border cursor-pointer">
-                  <option value="HKD">HKD</option>
-                  <option value="KRW">KRW</option>
-                  <option value="JPY">JPY</option>
-                  <option value="USD">USD</option>
-                </select>
-                <input type="number" step="any" id="tx-amount" placeholder="0.00" required class="flex-1 bg-transparent px-4 py-3 text-lg font-black outline-none placeholder:text-slate-400 text-memo-text">
-              </div>
-
-              <div id="conversion-preview" class="hidden mt-3 px-4 py-3 bg-slate-100 border-[2px] border-memo-border shadow-[2px_2px_0_0_#475569] text-xs flex items-center justify-between font-black uppercase text-memo-text">
-                <div class="flex items-center space-x-2">
-                  <i data-lucide="arrow-right-left" class="w-4 h-4 text-memo-muted"></i>
-                  <span>折合港幣：</span>
-                </div>
-                <span class="text-base" id="preview-hkd-val">HK$ 0.00</span>
-              </div>
-            </div>
-
-        <!-- 🚨 已經幫你刪除咗出事嗰行舊代碼 🚨 -->
-
-            <!-- 1. 分類與日期區塊 (使用 Flex 完美適應手機) -->
-            <div class="flex gap-3">
-              <div class="flex-1 min-w-0">
-                <label class="block text-sm font-black mb-2 uppercase text-memo-text">分類</label>
-                <select id="tx-category" class="w-full bg-white border-[3px] border-memo-border px-3 py-3 text-sm font-bold outline-none shadow-[4px_4px_0_0_#475569] cursor-pointer text-memo-text">
-                </select>
-              </div>
-              <div class="w-[140px] shrink-0">
-                <label class="block text-sm font-black mb-2 uppercase text-memo-text">日期</label>
-                <input type="date" id="tx-date" required class="w-full bg-white border-[3px] border-memo-border px-2 py-3 text-sm font-bold outline-none shadow-[4px_4px_0_0_#475569] text-memo-text">
-              </div>
-            </div>
-
-           <!-- 2. 支付方式與備註區塊 (改成 Flex，支付較窄，備註拉長) -->
-            <div class="flex flex-col sm:flex-row gap-5">
-              <div class="sm:w-[150px] shrink-0">
-                <label class="block text-sm font-black mb-2 uppercase text-memo-text">支付方式</label>
-                <select id="tx-account" class="w-full bg-white border-[3px] border-memo-border px-3 py-3 text-sm font-bold outline-none shadow-[4px_4px_0_0_#475569] cursor-pointer text-memo-text">
-                  <option value="信用卡">信用卡</option>
-                  <option value="現金">現金</option>
-                  <option value="銀行轉帳">銀行轉帳/FPS</option>
-                  <option value="八達通/電子錢包">八達通/PayMe</option>
-                </select>
-              </div>
-              <div class="flex-1 min-w-0">
-                <label class="block text-sm font-black mb-2 uppercase text-memo-text">備註說明</label>
-                <input type="text" id="tx-note" placeholder="例如：買了金容仙新專..." class="w-full bg-white border-[3px] border-memo-border px-4 py-3 text-sm font-bold outline-none shadow-[4px_4px_0_0_#475569] placeholder:text-slate-400 text-memo-text">
-              </div>
-            </div>
-
-            <button type="submit" id="btn-submit" class="w-full mt-6 memo-btn bg-memo-border text-white text-base py-4 hover:bg-white hover:text-memo-text">
-              <span id="btn-submit-text" class="flex justify-center items-center gap-2">
-                <i data-lucide="check" class="w-5 h-5"></i> 幫我入帳！
-              </span>
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <div class="lg:col-span-7 space-y-6 flex flex-col">
-        <div class="memo-card p-6 flex-1 flex flex-col">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b-[3px] border-memo-border gap-4">
-            <div>
-              <h2 class="text-xl font-black uppercase tracking-tight flex items-center space-x-2 text-memo-text">
-                <i data-lucide="archive" class="w-6 h-6"></i>
-                <span>歷史手帳紀錄</span>
-              </h2>
-            </div>
-            <div class="flex items-center space-x-3">
-              <button onclick="generateBattleReport()" class="memo-btn px-3 py-2 text-xs flex items-center space-x-1.5 shadow-[2px_2px_0_0_#475569] bg-memo-border text-white hover:bg-white hover:text-memo-text">
-                <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
-                <span>本月戰報</span>
-              </button>
-              <button id="btn-manual-sync" class="memo-btn px-3 py-2 text-xs flex items-center space-x-1.5 shadow-[2px_2px_0_0_#475569]">
-                <i data-lucide="refresh-cw" class="w-4 h-4" id="sync-spin-icon"></i>
-                <span>刷新</span>
-              </button>
-              <button id="btn-export-csv" class="memo-btn px-3 py-2 text-xs flex items-center space-x-1.5 shadow-[2px_2px_0_0_#475569]">
-                <i data-lucide="download" class="w-4 h-4"></i>
-                <span>匯出</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="flex items-center space-x-3 py-5 overflow-x-auto text-xs font-black uppercase">
-            <button data-filter="all" class="filter-btn memo-btn bg-memo-border text-white px-4 py-2 shadow-[2px_2px_0_0_#475569]">全部</button>
-            <button data-filter="expense" class="filter-btn memo-btn bg-white text-memo-text px-4 py-2 shadow-[2px_2px_0_0_#475569] hover:bg-memo-border hover:text-white">支出</button>
-            <button data-filter="income" class="filter-btn memo-btn bg-white text-memo-text px-4 py-2 shadow-[2px_2px_0_0_#475569] hover:bg-memo-border hover:text-white">入帳</button>
-            <button data-filter="saving" class="filter-btn memo-btn bg-white text-memo-text px-4 py-2 shadow-[2px_2px_0_0_#475569] hover:bg-memo-border hover:text-white">儲蓄</button>
-          </div>
-
-        <div id="tx-list" class="space-y-4 overflow-y-auto max-h-[440px] pr-3 custom-scrollbar flex-1 pb-4">
-            <div class="text-center py-16 space-y-4 text-memo-muted">
-              <i data-lucide="loader" class="w-10 h-10 mx-auto animate-spin"></i>
-              <p class="text-sm font-black uppercase">努力載入雲端紀錄中...</p>
-            </div>
-          </div>
-        </div> <!-- 👈 認住呢個歷史紀錄卡片嘅收尾括號 -->
-
-        <!-- 👇👇👇 請將待買清單貼喺呢度！ 👇👇👇 -->
-        <div class="memo-card p-6 space-y-4">
-          <div class="flex items-center justify-between border-b-[3px] border-memo-border pb-3">
-            <h2 class="text-xl font-black uppercase tracking-tight flex items-center space-x-2 text-memo-text">
-              <i data-lucide="shopping-bag" class="w-6 h-6"></i>
-              <span>🛍️ 待買清單</span>
-            </h2>
-            <span class="text-xs font-black bg-slate-100 px-2.5 py-1 border-2 border-memo-border shadow-[2px_2px_0_0_#475569] text-memo-text">
-              冷靜期審核中
-            </span>
-          </div>
-
-          <form id="tobuy-form" class="flex gap-3">
-            <input type="text" id="tobuy-input" placeholder="輸入想買的物品 (例如: 容仙同款睡衣...)" required class="flex-1 bg-white border-[3px] border-memo-border px-4 py-2.5 text-sm font-bold outline-none shadow-[4px_4px_0_0_#475569] placeholder:text-slate-400 text-memo-text">
-            <button type="submit" class="memo-btn px-4 py-2.5 text-xs flex items-center gap-1.5 shrink-0 bg-memo-border text-white hover:bg-white hover:text-memo-text">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-              <span>加入</span>
-            </button>
-          </form>
-
-          <div id="tobuy-list-container" class="space-y-2.5 pt-2">
-            <!-- 呢度會用 JS 動態顯示清單 -->
-          </div>
-        </div>
-        <!-- 👆👆👆 貼到呢度為止 👆👆👆 -->
-
-      </div> <!-- 👈 呢個係右邊成個大區塊 (lg:col-span-7) 嘅收尾括號 -->
-    </div>
-  </main>
-  
-  <!-- 📊 追星戰報彈窗 -->
-  <div id="report-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="memo-card w-full max-w-md p-6 space-y-6 border-[3px] border-memo-border shadow-[8px_8px_0_0_#475569]">
-      <div class="flex items-center justify-between border-b-[3px] border-memo-border pb-4">
-        <h3 class="text-xl font-black uppercase flex items-center space-x-2 text-memo-text">
-          <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
-          <span>📊 本月戰報與成就</span>
-        </h3>
-        <button onclick="document.getElementById('report-modal').classList.add('hidden')" class="hover:bg-slate-100 rounded p-1 transition-colors text-memo-text">
-          <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
-      </div>
-      
-      <div class="space-y-6">
-        <!-- 追星基金進度條 -->
-        <div>
-          <div class="flex justify-between items-end mb-2">
-            <span class="text-sm font-black uppercase text-memo-text">✈️ 追星基金達標率 (20%)</span>
-            <span id="report-pct-text" class="text-xs font-bold text-memo-text bg-slate-100 px-2 py-1 border-2 border-memo-border shadow-[2px_2px_0_0_#475569]">0%</span>
-          </div>
-          <div class="memo-bar-bg mb-2 h-4">
-            <div id="report-bar" class="memo-bar-fill w-0 bg-memo-border"></div>
-          </div>
-          <p id="report-fund-detail" class="text-xs font-bold text-memo-muted">累積: HK$ 0 / 目標: HK$ 3,600</p>
-        </div>
-
-        <!-- 容仙物價局 -->
-        <div class="bg-slate-100 p-4 border-[2px] border-memo-border shadow-[2px_2px_0_0_#475569]">
-          <h4 class="text-xs font-black uppercase text-memo-text mb-2 flex items-center gap-1"><i data-lucide="shopping-bag" class="w-4 h-4"></i> 容仙物價局分析</h4>
-          <p id="report-index-text" class="text-sm font-bold text-memo-text">分析中...</p>
-        </div>
-
-        <!-- 專屬結語 -->
-        <div class="flex items-start space-x-3 border-t-[3px] border-memo-border border-dashed pt-4">
-          <div class="text-3xl">🐰</div>
-          <p id="report-quote" class="text-sm font-black text-memo-text mt-1">...</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- 雲端設定彈窗 -->
-  <div id="settings-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="memo-card w-full max-w-md p-8 space-y-6">
-      <div class="flex items-center justify-between border-b-[3px] border-memo-border pb-4">
-        <h3 class="text-xl font-black uppercase flex items-center space-x-2 text-memo-text">
-          <i data-lucide="settings" class="w-6 h-6"></i>
-          <span>雲端 API 設定</span>
-        </h3>
-        <button id="btn-close-modal" class="hover:bg-slate-100 rounded p-1 transition-colors text-memo-text">
-          <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
-      </div>
-      <p class="text-sm font-bold text-memo-muted">
-        請填入 Google Apps Script 網址，確保雲端同步正常。
-      </p>
-      <div>
-        <label class="block text-xs font-black uppercase mb-2 text-memo-text">API 網址</label>
-        <input type="url" id="api-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="w-full bg-white border-[3px] border-memo-border px-4 py-3 text-sm font-bold outline-none shadow-[4px_4px_0_0_#475569] focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0_0_#475569] transition-all text-memo-text">
-      </div>
-      <div class="pt-4">
-        <button id="btn-save-api" class="w-full memo-btn bg-memo-border text-white text-base py-3 hover:bg-white hover:text-memo-text">確定連線</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // ==========================================
-    // ⚙️ 系統變數與設定
-    // ==========================================
-    let exchangeRates = { HKD: 1.0, KRW: 0.0056, JPY: 0.051, USD: 7.82 };
-    const BUDGET = { BASIC: 7200, WASTE: 4500 };
-    const categories = {
-      // 👇 喺「周邊」後面加咗「娛樂」
-      expense: ['餐飲', '交通', '周邊', '娛樂', '衣服', '保養護膚', '其他日常'], 
-      fixed: ['房租', 'Fromm訂閱', '電話費/上網', '其他固定'],
-      income: ['打工/薪水', '股息回報', '其他收入'],
-      saving: ['追星基金', '投資', '緊急醫療備用'] 
-    };
-    
-    // 基本生存開支
-    const basicCats = ['餐飲', '交通', '其他日常'];
-    // 娛樂與購物 (會影響容仙物價局) 👇 加埋「娛樂」入去！
-    const wasteCats = ['周邊', '娛樂', '衣服', '保養護膚'];
-
-    const solarQuotes = [
-      "「木木啊～今天有好好吃飯嗎？🍚✨」",
-      "「努力存錢的木木最帥氣了！摸摸頭～💪🐰❤️」",
-      "「比起買小廢物，容仙更想見到健健康康、荷包滿滿嘅你呀！💖」",
-      "「辛苦啦！今天也為了見我而努力忍住物慾了對吧？🥺✈️」",
-      "「肚餓想買宵夜？快啲去飲杯水早啲瞓！聽日見啦～😴💧」",
-      "「與其花錢買零食，不如陪我一齊做 100 下深蹲啦！🏋️‍♀️🔥」",
-      "「放下了那杯手搖飲，你離我又更近一步了！🧋❌ ➡️ 🎫⭕」",
-      "「又在看購物車了？快去打開 Solarsido 睇我唱歌！📺🎶」",
-      "「呀！你個購物車做咩又滿咗？快啲清空佢！😡🛒」",
-      "「又想亂洗錢？姐姐唔允許你咁做！🙅‍♀️🐰」",
-      "「金容仙正在看著你的錢包...👀💸」",
-      "「乖乖儲錢，下次演唱會我哋一定要對視喔！👀✨」",
-      "「洗少一蚊，距離首爾嘅天空又近一寸啦！✈️☁️」",
-      "「忍手唔買嗰陣，記得聽首《BLUES》冷靜下啦～👄🔥」",
-      "「這筆錢存下來，我們簽售會上就能多聊兩句了呢！🗣️💕」",
-      "「手放開個購物車！買小廢物不如留錢買我哋嘅新專啦！💸🙅‍♀️」",
-      "「再亂買嘢，我就要喺台上心痛你個荷包啦！💔」",
-      "「今日又想飲廢水？飲水啦！當係為咗下次見面嘅飛啊！💧🎫」",
-      "「忍住呀木木！你嘅存款數字先係最靚嘅應援聲！💚📈」",
-      "「每次想亂洗錢嗰陣，試下大嗌三聲『金容仙』冷靜下！🗣️🐰」",
-      "「唔好為咗慳錢餓親自己呀！要食得飽飽先有氣力嗌應援㗎！🍱💪」",
-      "「辛苦你啦，今日為咗見我都好努力做嘢同忍手呢！摸摸頭～🐰💖」",
-      "「容仙今日都好掛住木木！我哋一齊努力為未來打算啦！✨」",
-      "「無論今日遇到咩事，記得笑一個！木木笑起上嚟最靚！😊」",
-      "「每慳一蚊，我哋喺簽售會對視嘅時間就好似多咗一秒咁！👀💕」",
-      "「留返啲錢，下次演唱會記得買最近舞台嘅位呀！我會望住你㗎！🎤🎫」",
-      "「大發！木木嘅小金庫又變厚咗啦！約定你首爾見啦！✈️🇰🇷」",
-      "「好好準備你嘅追星基金，下次回歸我哋要玩得最開心！🔥」",
-      "「무무야! 또 쓸데없는 거 사려고? 그 돈 모아서 나 보러 와야지! 🤨」",
-      "「장바구니 당장 안 비워? 언니가 지켜보고 있다... 👀💸」",
-      "「아끼면 똥 된다고? 아니지, 아끼면 콘서트 1열 되는 거야! ✨🎟️」",
-      "「오늘도 꾹 참고 안 샀네? 우리 무무 완전 칭찬해~ 쓰담쓰담 🐶💕」",
-      "「돈 모으는 것도 중요한데, 밥은 잘 챙겨 먹고 있는 거지? 아프면 혼나! 🍚😡」",
-      "「그 돈 아껴서 영통팬싸 오면 나랑 더 오래 얘기할 수 있잖아~ 안 그래? 📱💬」",
-      "「나중에 텅장 보고 후회하지 말고! 지금부터 용선이 말 잘 듣기, 약속! 🤙🐰」",
-      "「돈 쓸 궁리 그만하고 솔라시도나 한 편 더 보러 가자! 고고씽~ 📺🏃‍♀️」"
-    ];
-
-    const today = new Date();
-    const currentMonthStr = today.toISOString().slice(0, 7);
-    let currentFilter = 'all';
-    let apiUrl = localStorage.getItem('smartspend_api_url') || '';
-    let selectedMonthStr = currentMonthStr; 
-    let transactions = []; 
-
-    // 初始化記帳資料
-    let allTransactions = [];
-    try {
-      let stored = JSON.parse(localStorage.getItem('smartspend_records'));
-      allTransactions = Array.isArray(stored) ? stored : [];
-    } catch(e) {
-      allTransactions = [];
-      localStorage.removeItem('smartspend_records');
-    }
-
-    // 初始化待買清單資料
-    let toBuyItems = [];
-    try {
-      toBuyItems = JSON.parse(localStorage.getItem('memo_tobuy_items')) || [];
-    } catch(e) {
-      toBuyItems = [];
-    }
-
-    // ==========================================
-    // 🛍️ 待買清單 (To-Buy List) 專屬邏輯
-    // ==========================================
-    function renderToBuyList() {
-      const container = document.getElementById('tobuy-list-container');
-      if (!container) return;
-      
-      container.innerHTML = '';
-      if (toBuyItems.length === 0) {
-        container.innerHTML = '<p class="text-xs font-bold text-memo-muted py-2 text-center">清單空空如也，荷包好安全！🧘‍♀️</p>';
-        return;
-      }
-
-      toBuyItems.forEach((item) => {
-        const div = document.createElement('div');
-        div.className = `flex items-center justify-between p-3 border-2 transition-all ${item.done ? 'bg-slate-50 border-slate-300 opacity-60' : 'bg-white border-memo-border shadow-[2px_2px_0_0_#475569]'}`;
-        div.innerHTML = `
-          <div class="flex items-center space-x-3 flex-1 min-w-0">
-            <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleToBuy('${item.id}')" class="w-4 h-4 cursor-pointer shrink-0 accent-slate-700">
-            <span class="text-sm font-bold truncate ${item.done ? 'line-through text-slate-500' : 'text-memo-text'}">${item.text}</span>
-          </div>
-          <button onclick="deleteToBuy('${item.id}')" class="text-slate-400 hover:text-red-500 transition-colors p-1 ml-2">
-            <i data-lucide="trash-2" class="w-4 h-4"></i>
-          </button>
-        `;
-        container.appendChild(div);
-      });
-      lucide.createIcons();
-    }
-
-    async function addToBuyItem(e) {
-      e.preventDefault();
-      const input = document.getElementById('tobuy-input');
-      const text = input.value.trim();
-      if (!text) return;
-      
-      const newItem = { id: Date.now().toString(), text, done: false };
-      toBuyItems.unshift(newItem);
-      localStorage.setItem('memo_tobuy_items', JSON.stringify(toBuyItems));
-      input.value = '';
-      renderToBuyList();
-
-      if (apiUrl) {
-        try {
-          await fetch(apiUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ target: 'tobuy', action: 'add', data: newItem })
-          });
-        } catch(err) { console.warn('ToBuy Sync Failed', err); }
-      }
-    }
-
-    window.toggleToBuy = async function(id) {
-      const item = toBuyItems.find(t => t.id === id);
-      if (!item) return;
-      item.done = !item.done;
-      localStorage.setItem('memo_tobuy_items', JSON.stringify(toBuyItems));
-      renderToBuyList();
-
-      if (apiUrl) {
-        try {
-          await fetch(apiUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ target: 'tobuy', action: 'toggle', id, done: item.done })
-          });
-        } catch(err) { console.warn('ToBuy Toggle Failed', err); }
-      }
-    };
-
-    window.deleteToBuy = async function(id) {
-      toBuyItems = toBuyItems.filter(t => t.id !== id);
-      localStorage.setItem('memo_tobuy_items', JSON.stringify(toBuyItems));
-      renderToBuyList();
-
-      if (apiUrl) {
-        try {
-          await fetch(apiUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ target: 'tobuy', action: 'delete', id })
-          });
-        } catch(err) { console.warn('ToBuy Delete Failed', err); }
-      }
-    };
-
-    // ==========================================
-    // 📊 主要記帳與工具邏輯
-    // ==========================================
-    function getLastMonthString(currentStr) {
-      if (!currentStr || !currentStr.includes('-')) return '';
-      const parts = currentStr.split('-');
-      let y = parseInt(parts[0], 10);
-      let m = parseInt(parts[1], 10) - 1;
-      if (m === 0) {
-        m = 12;
-        y -= 1;
-      }
-      return `${y}-${String(m).padStart(2, '0')}`;
-    }
-
-    function initMonthSelector() {
-      const selectors = ['month-selector', 'month-selector-mobile'];
-      const monthSet = new Set();
-      monthSet.add(currentMonthStr);
-      allTransactions.forEach(t => {
-        if(t && typeof t.date === 'string') monthSet.add(t.date.slice(0, 7));
-      });
-
-      const sortedMonths = Array.from(monthSet).sort((a, b) => b.localeCompare(a));
-      
-      selectors.forEach(selId => {
-        const selector = document.getElementById(selId);
-        if(!selector) return;
-        
-        selector.innerHTML = '';
-        sortedMonths.forEach(m => {
-          const opt = document.createElement('option');
-          opt.value = m;
-          opt.textContent = m.replace('-', ' . ');
-          if(m === selectedMonthStr) opt.selected = true;
-          selector.appendChild(opt);
-        });
-
-        selector.onchange = (e) => {
-          selectedMonthStr = e.target.value;
-          const otherSelId = selId === 'month-selector' ? 'month-selector-mobile' : 'month-selector';
-          const otherSel = document.getElementById(otherSelId);
-          if(otherSel) otherSel.value = selectedMonthStr;
-          
-          filterDataByMonth();
-          renderDashboard();
-        };
-      });
-    }
-
-    function filterDataByMonth() {
-      transactions = allTransactions.filter(t => t && typeof t.date === 'string' && t.date.startsWith(selectedMonthStr));
-    }
-
-    function randomizeQuote() {
-      const idx = Math.floor(Math.random() * solarQuotes.length);
-      const quoteEl = document.getElementById('solar-quote');
-      if(quoteEl) quoteEl.textContent = solarQuotes[idx];
-    }
-
-    async function fetchLiveRates() {
-      try {
-        const res = await fetch('https://open.er-api.com/v6/latest/HKD');
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.rates) {
-            exchangeRates.KRW = +(1 / data.rates.KRW).toFixed(6);
-            exchangeRates.JPY = +(1 / data.rates.JPY).toFixed(5);
-            exchangeRates.USD = +(1 / data.rates.USD).toFixed(4);
-            const el = document.getElementById('rate-krw-text');
-            if (el) el.textContent = `${(exchangeRates.KRW * 1000).toFixed(2)} HKD`;
-          }
-        }
-      } catch (err) { console.warn('Network Error', err); }
-    }
-
-    // 💡 雲端同步防 Crash 強化版
-    async function syncFromCloud() {
-      if (!apiUrl) {
-        updateSyncStatus(false, '尚未連線');
-        document.getElementById('settings-modal').classList.remove('hidden');
-        renderDashboard();
-        return;
-      }
-
-      updateSyncStatus(null, '同步中...');
-      const spinIcon = document.getElementById('sync-spin-icon');
-      if (spinIcon) spinIcon.classList.add('animate-spin');
-
-      try {
-        const fetchUrl = apiUrl + (apiUrl.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
-        const res = await fetch(fetchUrl);
-        
-        if (res.ok) {
-          const text = await res.text();
-          let data;
-          try {
-            data = JSON.parse(text); // 嘗試解析 JSON
-          } catch (e) {
-            console.error("🚨 致命錯誤：API 回傳的不是資料，而是網頁！請檢查 Google Apps Script 權限與部署版本。API 回傳內容：", text);
-            throw new Error("API 設定錯誤，回傳了非 JSON 內容");
-          }
-          
-          if (data && data.transactions) {
-            // 新版格式
-            allTransactions = data.transactions.map(t => {
-              if (t && t.date) {
-                const d = new Date(t.date);
-                if (!isNaN(d.getTime())) {
-                  t.date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                }
-              }
-              return t;
-            });
-            localStorage.setItem('smartspend_records', JSON.stringify(allTransactions));
-            
-            if (data.tobuy) {
-              toBuyItems = data.tobuy;
-              localStorage.setItem('memo_tobuy_items', JSON.stringify(toBuyItems));
-              renderToBuyList();
-            }
-            updateSyncStatus(true, '同步成功');
-          } else if (Array.isArray(data)) {
-            // 兼容舊版
-            allTransactions = data.map(t => {
-              if (t && t.date) {
-                const d = new Date(t.date);
-                if (!isNaN(d.getTime())) {
-                  t.date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                }
-              }
-              return t;
-            });
-            localStorage.setItem('smartspend_records', JSON.stringify(allTransactions));
-            updateSyncStatus(true, '同步成功');
-          } else {
-             throw new Error("數據格式不明");
-          }
-        }
-      } catch (err) {
-        console.warn('Sync failed:', err);
-        updateSyncStatus(false, '同步失敗');
-      } finally {
-        if (spinIcon) spinIcon.classList.remove('animate-spin');
-        initMonthSelector();
-        filterDataByMonth();
-        renderDashboard();
-      }
-    }
-
-    function updateSyncStatus(isSuccess, text) {
-      const dot = document.getElementById('sync-indicator');
-      const label = document.getElementById('sync-status');
-      if(!dot || !label) return;
-      label.textContent = text;
-      if (isSuccess === true) {
-        dot.className = 'w-2.5 h-2.5 bg-memo-border border-2 border-memo-border inline-block';
-      } else if (isSuccess === false) {
-        dot.className = 'w-2.5 h-2.5 bg-white border-2 border-memo-border inline-block';
-      } else {
-        dot.className = 'w-2.5 h-2.5 bg-slate-400 border-2 border-memo-border animate-pulse inline-block';
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      // 綁定「顯示/隱藏金額」按鈕
-      const btnToggleBalance = document.getElementById('btn-toggle-balance');
-      if (btnToggleBalance) {
-        btnToggleBalance.addEventListener('click', () => {
-          const isHidden = localStorage.getItem('hide_balance') === 'true';
-          localStorage.setItem('hide_balance', !isHidden); // 切換狀態
-          renderDashboard(); // 重新整理數字畫面
-        });
-      }
-      
-      // 綁定待買清單事件
-      const tobuyForm = document.getElementById('tobuy-form');
-      if (tobuyForm) tobuyForm.addEventListener('submit', addToBuyItem);
-      renderToBuyList();
-
-      const btnSaveApi = document.getElementById('btn-save-api');
-      if (btnSaveApi) {
-        btnSaveApi.addEventListener('click', () => {
-          const val = document.getElementById('api-url-input').value.trim();
-          if (val) {
-            apiUrl = val;
-            localStorage.setItem('smartspend_api_url', apiUrl);
-            document.getElementById('settings-modal').classList.add('hidden');
-            syncFromCloud();
-          } else {
-            alert('請輸入有效的 Google Apps Script 網址！');
-          }
-        });
-      }
-
-      const btnOpenSettings = document.getElementById('btn-open-settings');
-      if (btnOpenSettings) {
-        btnOpenSettings.addEventListener('click', () => {
-          document.getElementById('api-url-input').value = apiUrl;
-          document.getElementById('settings-modal').classList.remove('hidden');
-        });
-      }
-
-      const btnCloseModal = document.getElementById('btn-close-modal');
-      if (btnCloseModal) {
-        btnCloseModal.addEventListener('click', () => {
-          document.getElementById('settings-modal').classList.add('hidden');
-        });
-      }
-
-      const dateInput = document.getElementById('tx-date');
-      if(dateInput) dateInput.value = new Date().toISOString().split('T')[0];
-
-      renderCategoryOptions('expense');
-      lucide.createIcons();
-      fetchLiveRates();
-      randomizeQuote();
-      initMonthSelector();
-      filterDataByMonth();
-
-      if (apiUrl) {
-        document.getElementById('api-url-input').value = apiUrl;
-        syncFromCloud();
-      } else {
-        document.getElementById('settings-modal').classList.remove('hidden');
-        renderDashboard();
-      }
-
-      document.querySelectorAll('.type-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const type = e.currentTarget.dataset.type;
-          document.getElementById('tx-type').value = type;
-          
-          document.querySelectorAll('.type-btn').forEach(b => {
-            b.className = 'type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none hover:bg-slate-200 hover:text-black';
-          });
-          e.currentTarget.className = `type-btn active memo-btn py-3 text-sm`;
-          
-          renderCategoryOptions(type);
-          updatePreview();
-        });
-      });
-
-      const txAmt = document.getElementById('tx-amount');
-      if(txAmt) txAmt.addEventListener('input', updatePreview);
-      const txCur = document.getElementById('tx-currency');
-      if(txCur) txCur.addEventListener('change', updatePreview);
-      const txForm = document.getElementById('tx-form');
-      if(txForm) txForm.addEventListener('submit', handleAddTransaction);
-
-      const btnCloseRollover = document.getElementById('btn-close-rollover');
-      if (btnCloseRollover) {
-        btnCloseRollover.addEventListener('click', () => {
-          const lastMonthTargetStr = getLastMonthString(selectedMonthStr);
-          localStorage.setItem(`rollover_claimed_${lastMonthTargetStr}`, 'true'); // 標記為已處理
-          document.getElementById('rollover-alert').classList.add('hidden');
-        });
-      }
-      
-      const btnGacha = document.getElementById('btn-claim-gacha');
-      if(btnGacha) btnGacha.addEventListener('click', () => handleRollover('gacha'));
-      const btnBase = document.getElementById('btn-claim-base');
-      if(btnBase) btnBase.addEventListener('click', () => handleRollover('base'));
-
-      const btnSync = document.getElementById('btn-manual-sync');
-      if(btnSync) {
-        btnSync.addEventListener('click', () => {
-          randomizeQuote();
-          syncFromCloud();
-        });
-      }
-      const btnExp = document.getElementById('btn-export-csv');
-      if(btnExp) btnExp.addEventListener('click', exportToCSV);
-
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          document.querySelectorAll('.filter-btn').forEach(b => {
-            b.className = 'filter-btn memo-btn bg-white text-memo-text px-4 py-2 shadow-[2px_2px_0_0_#475569] hover:bg-memo-border hover:text-white';
-          });
-          e.currentTarget.className = 'filter-btn memo-btn bg-memo-border text-white px-4 py-2 shadow-[2px_2px_0_0_#475569]';
-          currentFilter = e.currentTarget.dataset.filter;
-          renderList();
-        });
-      });
-    });
-
-    function renderCategoryOptions(type) {
-      const select = document.getElementById('tx-category');
-      if(!select) return;
-      select.innerHTML = '';
-      
-      let opts = categories[type] || [];
-      opts.forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat;
-        opt.textContent = cat;
-        select.appendChild(opt);
-      });
-    }
-
-    function updatePreview() {
-      const amountEl = document.getElementById('tx-amount');
-      const currencyEl = document.getElementById('tx-currency');
-      const previewBox = document.getElementById('conversion-preview');
-      const previewVal = document.getElementById('preview-hkd-val');
-      
-      if(!amountEl || !currencyEl || !previewBox || !previewVal) return;
-
-      const amount = parseFloat(amountEl.value);
-      const currency = currencyEl.value;
-      
-      if (!amount || isNaN(amount)) {
-        previewBox.classList.add('hidden'); return;
-      }
-      const rate = exchangeRates[currency] || 1.0;
-      const hkdAmount = amount * rate;
-      if (currency !== 'HKD') {
-        previewBox.classList.remove('hidden');
-        previewVal.textContent = `HK$ ${hkdAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-      } else {
-        previewBox.classList.add('hidden');
-      }
-    }
-
-    async function handleAddTransaction(e) {
-      e.preventDefault();
-      
-      const rawType = document.getElementById('tx-type').value;
-      const type = (rawType === 'fixed') ? 'expense' : rawType;
-      
-      const currency = document.getElementById('tx-currency').value;
-      const originalAmount = parseFloat(document.getElementById('tx-amount').value);
-      const rate = exchangeRates[currency] || 1.0;
-      const amountHKD = +(originalAmount * rate).toFixed(2);
-      
-      let category = document.getElementById('tx-category').value;
-      const date = document.getElementById('tx-date').value;
-      const account = document.getElementById('tx-account').value;
-      const note = document.getElementById('tx-note').value.trim();
-
-      if (!originalAmount || originalAmount <= 0) return;
-      
-      const newTx = {
-        id: Date.now().toString(), type, category, originalAmount, currency, rate, amountHKD, date, account, note
-      };
-
-      allTransactions.unshift(newTx);
-      localStorage.setItem('smartspend_records', JSON.stringify(allTransactions));
-      
-      if(date.startsWith(selectedMonthStr)) {
-        filterDataByMonth();
-      }
-      
-      initMonthSelector();
-      renderDashboard();
-
-      document.getElementById('tx-amount').value = '';
-      document.getElementById('tx-note').value = '';
-      document.getElementById('conversion-preview').classList.add('hidden');
-
-      if (apiUrl) {
-        updateSyncStatus(null, '傳輸中...');
-        try {
-          await fetch(apiUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'add', data: newTx })
-          });
-          updateSyncStatus(true, '同步成功');
-        } catch (err) {
-          updateSyncStatus(false, '傳送失敗 (留存本地)');
-        }
-      }
-    }
-
-    window.deleteTx = async function(id) {
-      if (!confirm('確定要撕掉這張紀錄嗎？')) return;
-      allTransactions = allTransactions.filter(t => t.id !== id);
-      localStorage.setItem('smartspend_records', JSON.stringify(allTransactions));
-      
-      filterDataByMonth();
-      initMonthSelector();
-      renderDashboard();
-
-      if (apiUrl) {
-        updateSyncStatus(null, '傳輸中...');
-        try {
-          await fetch(apiUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'delete', id: id })
-          });
-          updateSyncStatus(true, '同步成功');
-        } catch (err) {
-          updateSyncStatus(false, '刪除失敗');
-        }
-      }
-    };
-
-  async function handleRollover(actionType) {
-      const lastMonthTargetStr = getLastMonthString(selectedMonthStr);
-      // 💡 關鍵修改：從輸入框讀取你修改後嘅數值
-      const inputEl = document.getElementById('rollover-amount-input');
-      const finalAmount = parseFloat(inputEl.value) || 0;
-      
-      if(finalAmount <= 0) {
-        alert('請輸入大於 0 的金額！');
-        return;
-      }
-
-      localStorage.setItem(`rollover_claimed_${lastMonthTargetStr}`, 'true');
-      
-      if(actionType === 'gacha') {
-        let existingBonus = parseFloat(localStorage.getItem(`gacha_bonus_${selectedMonthStr}`)) || 0;
-        localStorage.setItem(`gacha_bonus_${selectedMonthStr}`, existingBonus + finalAmount);
-        document.getElementById('rollover-alert').classList.add('hidden');
-        renderDashboard();
-     } else if (actionType === 'base') {
-        const newTx = {
-          id: Date.now().toString(),
-          type: 'saving',
-          category: '追星基金', // 👈 呢度改做新名，等系統識得自動歸類
-          originalAmount: finalAmount,
-          currency: 'HKD',
-          rate: 1.0,
-          amountHKD: finalAmount,
-          date: new Date().toISOString().split('T')[0],
-          account: '銀行轉帳',
-          note: `📝 忍手成功嘅獎勵！！(結餘撥入)`
-        };
-        allTransactions.unshift(newTx);
-        localStorage.setItem('smartspend_records', JSON.stringify(allTransactions));
-        
-        filterDataByMonth();
-        document.getElementById('rollover-alert').classList.add('hidden');
-        renderDashboard();
-
-        if (apiUrl) {
-          fetch(apiUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'add', data: newTx })
-          });
-        }
-      }
-    }
-
-    function renderDashboard() {
-      let currExpense = 0, currIncome = 0, currSaving = 0;
-      let currBasicSpent = 0, currWasteSpent = 0;
-      let currFlexSaving = 0, currUrgentSaving = 0;
-      let lastExpense = 0, lastSaving = 0, lastWasteSpent = 0;
-
-      const lastMonthTargetStr = getLastMonthString(selectedMonthStr);
-
-      transactions.forEach(t => {
-        if (!t) return;
-        if (t.type === 'expense') {
-          currExpense += t.amountHKD;
-          if(basicCats.includes(t.category)) currBasicSpent += t.amountHKD;
-          if(wasteCats.includes(t.category)) currWasteSpent += t.amountHKD;
-        }
-        if (t.type === 'income') {
-          currIncome += t.amountHKD;
-        }
-        if (t.type === 'saving') {
-          currSaving += t.amountHKD;
-          if (t.category === '緊急醫療備用') {
-            currUrgentSaving += t.amountHKD;
-          } else {
-            currFlexSaving += t.amountHKD;
-          }
-        }
-      });
-
-      allTransactions.forEach(t => {
-        if(t && t.date && t.date.startsWith(lastMonthTargetStr)) {
-          if(t.type === 'expense') {
-            lastExpense += t.amountHKD;
-            if(wasteCats.includes(t.category)) lastWasteSpent += t.amountHKD;
-          }
-          if(t.type === 'saving') lastSaving += t.amountHKD;
-        }
-      });
-
-      const netBalance = currIncome - currExpense - currSaving;
-      const fmt = (num) => 'HK$ ' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-      const statExp = document.getElementById('stat-expense');
-      const statSav = document.getElementById('stat-saving');
-      const statBal = document.getElementById('stat-balance');
-      const statInc = document.getElementById('stat-income');
-      
-     // 💡 讀取隱藏狀態
-      const hideBalance = localStorage.getItem('hide_balance') === 'true';
-      const iconEye = document.getElementById('icon-eye');
-      const iconEyeOff = document.getElementById('icon-eye-off');
-      
-      if (iconEye && iconEyeOff) {
-        if (hideBalance) {
-          iconEye.classList.add('hidden');
-          iconEyeOff.classList.remove('hidden');
-        } else {
-          iconEye.classList.remove('hidden');
-          iconEyeOff.classList.add('hidden');
-        }
-      }
-
-      if(statExp) statExp.textContent = fmt(currExpense);
-      if(statSav) statSav.textContent = fmt(currSaving);
-      
-     // 💡 如果開咗隱私模式，就變成星號 HK$ *****
-      if(statBal) statBal.textContent = hideBalance ? 'HK$ *****' : fmt(netBalance);
-      if(statInc) statInc.textContent = hideBalance ? 'HK$ *****' : fmt(currIncome);
-
-      const expenseDiff = currExpense - lastExpense;
-      const momExpEl = document.getElementById('mom-expense-text');
-      if (momExpEl) {
-        if (lastExpense === 0) {
-           momExpEl.innerHTML = `<span class="text-slate-500">上個月無資料比較</span>`;
-        } else if (expenseDiff > 0) {
-          momExpEl.innerHTML = `呀！今個月洗多咗 ${fmt(Math.abs(expenseDiff))}，離容仙又遠咗一步ㅠㅠ`;
-        } else if (expenseDiff < 0) {
-          momExpEl.innerHTML = `大發！今個月比上個月慳咗 ${fmt(Math.abs(expenseDiff))}，又可以抽多兩張專！🎉`;
-        } else {
-          momExpEl.innerHTML = `同上個月一樣咁生性，繼續保持住！✨`;
-        }
-      }
-
-      const savingDiff = currSaving - lastSaving;
-      const momSavEl = document.getElementById('mom-saving-text');
-      if (momSavEl) {
-        if (lastSaving === 0) {
-           momSavEl.innerHTML = `<span class="text-slate-500">上月無紀錄</span>`;
-        } else if (savingDiff >= 0) {
-          momSavEl.innerHTML = `儲錢達標 (+${fmt(savingDiff)})，機票基金越來越穩陣！`;
-        } else {
-          momSavEl.innerHTML = `儲得慢咗 (-${fmt(Math.abs(savingDiff))})，下個月要加把勁慳錢！`;
-        }
-      }
-
-      const basicPct = Math.min(100, (currBasicSpent / BUDGET.BASIC) * 100);
-      const basicBar = document.getElementById('basic-bar');
-      const basicText = document.getElementById('basic-status-text');
-      const basicRatio = document.getElementById('basic-ratio');
-      if(basicRatio) basicRatio.textContent = `${currBasicSpent.toLocaleString()} / ${BUDGET.BASIC.toLocaleString()} HKD`;
-      if(basicBar) basicBar.style.width = `${basicPct}%`;
-      
-      if(basicBar && basicText) {
-        if(basicPct < 60) {
-          basicBar.className = "memo-bar-fill";
-          basicText.innerHTML = '日常食飽飽，先有力見金容仙跑！';
-        } else if (basicPct < 85) {
-          basicBar.className = "memo-bar-fill bar-warning";
-          basicText.innerHTML = '飯錢超標警告！食樹皮嘅日子近了...🚨';
-        } else {
-          basicBar.className = "memo-bar-fill";
-          basicText.innerHTML = '<span class="font-black line-through decoration-2">準備去食樹皮！</span>';
-        }
-      }
-
-      let currentWasteBudget = BUDGET.WASTE;
-      let gachaBonus = parseFloat(localStorage.getItem(`gacha_bonus_${selectedMonthStr}`)) || 0;
-      currentWasteBudget += gachaBonus;
-
-      const wastePct = Math.min(100, (currWasteSpent / currentWasteBudget) * 100);
-      const gachaBar = document.getElementById('gacha-bar');
-      const gachaText = document.getElementById('gacha-status-text');
-      const gachaRatio = document.getElementById('gacha-ratio');
-      if(gachaRatio) gachaRatio.textContent = `${currWasteSpent.toLocaleString()} / ${currentWasteBudget.toLocaleString()} HKD`;
-      if(gachaBar) gachaBar.style.width = `${wastePct}%`;
-
-      if(gachaBar && gachaText) {
-        if(wastePct < 60) {
-          gachaBar.className = "memo-bar-fill";
-          gachaText.innerHTML = '荷包好聽話，距離簽售又行前咗一大步！';
-        } else if (wastePct < 85) {
-          gachaBar.className = "memo-bar-fill bar-warning";
-          gachaText.innerHTML = '金容仙警告你：收手啦！再買落去首爾簽售就冇你份㗎喇！🙅‍♀️🐰';
-        } else {
-          gachaBar.className = "memo-bar-fill";
-          gachaText.innerHTML = '<span class="font-black line-through decoration-2">預算見底！準備食樹皮！</span>';
-        }
-      }
-
-      // --- 彈性儲蓄進度條 (20%) ---
-      const localGachaBonus = parseFloat(localStorage.getItem(`gacha_bonus_${selectedMonthStr}`)) || 0;
-      const localWasteBudget = BUDGET.WASTE + localGachaBonus;
-      const basicOverspent = Math.max(0, currBasicSpent - BUDGET.BASIC);
-      const wasteOverspent = Math.max(0, currWasteSpent - localWasteBudget);
-      const totalOverspent = basicOverspent + wasteOverspent;
-      const netFlexSaving = currFlexSaving - totalOverspent;
-
-      const TARGET_FLEX = 3600;
-      const flexPct = (netFlexSaving / TARGET_FLEX) * 100;
-      const flexBar = document.getElementById('flex-bar');
-      const flexText = document.getElementById('flex-status-text');
-      const flexRatio = document.getElementById('flex-ratio');
-      
-      if(flexRatio) {
-        if (netFlexSaving < 0) {
-          flexRatio.innerHTML = `<span class="underline decoration-2 font-black text-red-500">${netFlexSaving.toLocaleString()}</span> / ${TARGET_FLEX.toLocaleString()} HKD`;
-        } else {
-          flexRatio.textContent = `${netFlexSaving.toLocaleString()} / ${TARGET_FLEX.toLocaleString()} HKD`;
-        }
-      }
-
-      if(flexBar) {
-        if (netFlexSaving < 0) {
-          flexBar.style.width = '100%';
-          flexBar.className = 'memo-bar-fill bar-warning';
-        } else {
-          flexBar.style.width = `${Math.min(100, Math.max(0, flexPct))}%`;
-          flexBar.className = 'memo-bar-fill bg-slate-400';
-        }
-      }
-      
-      if(flexText) {
-        if (netFlexSaving < 0) {
-          flexText.innerHTML = `🚨 超支透支中！倒扣咗 HK$ ${Math.abs(netFlexSaving).toLocaleString()}！`;
-        } else if (flexPct >= 100) {
-          flexText.innerHTML = '彈性儲備達標！隨時可以買機票起飛！✈️';
-        } else if (flexPct >= 50) {
-          flexText.innerHTML = '進度過半！繼續保持！💪';
-        } else {
-          flexText.innerHTML = '距離去見金容仙仲有段距離呀！🐢';
-        }
-      }
-
-      // --- 緊急備用金進度條 (15%) ---
-      const TARGET_URGENT = 2700;
-      const urgentPct = Math.min(100, (currUrgentSaving / TARGET_URGENT) * 100);
-      const urgentBar = document.getElementById('urgent-bar');
-      const urgentText = document.getElementById('urgent-status-text');
-      const urgentRatio = document.getElementById('urgent-ratio');
-      
-      if(urgentRatio) urgentRatio.textContent = `${currUrgentSaving.toLocaleString()} / ${TARGET_URGENT.toLocaleString()} HKD`;
-      if(urgentBar) urgentBar.style.width = `${urgentPct}%`;
-      
-      if(urgentText) {
-        if(urgentPct >= 100) {
-          urgentText.innerHTML = '保命金達標！充滿安全感！🛡️';
-        } else if (urgentPct >= 50) {
-          urgentText.innerHTML = '保命金儲蓄中...好穩陣！🧱';
-        } else {
-          urgentText.innerHTML = '安全網未夠厚，小心啲呀！🚨';
-        }
-      }
-      
-   // 💡 確保只有一組宣告
-      const hasClaimed = localStorage.getItem(`rollover_claimed_${lastMonthTargetStr}`);
-      const lastMonthRemaining = BUDGET.WASTE - lastWasteSpent;
-      const roAlert = document.getElementById('rollover-alert');
-      
-      if (roAlert) {
-        if (!hasClaimed && lastMonthRemaining > 0 && allTransactions.some(t => t && t.date && t.date.startsWith(lastMonthTargetStr))) {
-          // 將結餘數字設定落輸入框畀你睇同改
-          const roInput = document.getElementById('rollover-amount-input');
-          if (roInput) roInput.value = lastMonthRemaining;
-          
-          roAlert.classList.remove('hidden');
-        } else {
-          roAlert.classList.add('hidden');
-        }
-      }
-
-      renderList();
-    }
-
-    function renderList() {
-      const container = document.getElementById('tx-list');
-      if (!container) return;
-
-      container.innerHTML = '';
-
-      const filtered = transactions.filter(t => currentFilter === 'all' || t.type === currentFilter);
-
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-16 space-y-4">
-            <i data-lucide="file-dashed" class="w-10 h-10 mx-auto text-slate-400"></i>
-            <p class="text-sm font-black uppercase text-slate-500">今個月一張單都未有，快啲記低第一筆啦！✍️</p>
-          </div>
-        `;
-        lucide.createIcons();
-        return;
-      }
-      
-      let html = '';
-      filtered.forEach(item => {
-        let sign = '-';
-        let iconName = 'shopping-cart';
-        let borderStyle = 'border-2 border-gray-300';
-        let iconBg = 'bg-white text-black';
-
-        if (item.type === 'income') {
-          sign = '+';
-          iconName = 'wallet';
-          borderStyle = 'border-[3px] border-black shadow-[2px_2px_0_0_#1c1917]';
-          iconBg = 'bg-black text-white';
-        } else if (item.type === 'saving') {
-          sign = '';
-          iconName = 'ticket';
-          borderStyle = 'border-2 border-black border-dashed';
-          iconBg = 'bg-gray-200 text-black';
-        }
-
-        const isForeign = item.currency !== 'HKD';
-        const origText = isForeign 
-          ? `<span class="text-[10px] font-black ml-2 underline decoration-2 text-slate-500">(${item.originalAmount.toLocaleString()} ${item.currency})</span>` 
-          : '';
-
-        let painText = '';
-        if (item.type === 'expense' && wasteCats.includes(item.category)) {
-          const albumsLost = (item.amountHKD / 150).toFixed(1);
-          painText = `<div class="text-[10px] font-bold text-slate-500 mt-1">💔 (約等於撕碎了 ${albumsLost} 張專輯...)</div>`;
-        }
-
-        html += `
-          <div class="p-4 bg-white ${borderStyle} hover:bg-slate-50 transition-colors flex items-center justify-between group">
-            <div class="flex items-center space-x-4">
-              <div class="w-10 h-10 ${iconBg} border-[2px] border-black flex items-center justify-center shrink-0">
-                <i data-lucide="${iconName}" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <div class="flex items-center space-x-2">
-                  <span class="text-sm font-black">${item.category}</span>
-                  <span class="text-[10px] px-1.5 py-0.5 border-2 border-black font-black uppercase">${item.account}</span>
-                </div>
-                <div class="text-xs text-memo-muted flex items-center space-x-2 mt-1 font-bold">
-                  <span>${item.date}</span>
-                  ${item.note ? `<span class="text-gray-300">|</span><span class="truncate max-w-[120px] sm:max-w-[200px] text-black">${item.note}</span>` : ''}
-                </div>
-                ${painText}
-              </div>
-            </div>
-            <div class="flex items-center space-x-3">
-              <div class="text-right">
-                <div class="text-lg font-black">
-                  ${sign}HK$ ${item.amountHKD.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </div>
-                ${origText}
-              </div>
-              <button onclick="deleteTx('${item.id}')" class="opacity-0 group-hover:opacity-100 border-[2px] border-black bg-white p-1.5 hover:bg-black hover:text-white transition-all shadow-[2px_2px_0_0_#1c1917]" title="撕掉紀錄">
-                <i data-lucide="trash-2" class="w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-        `;
-      });
-      container.innerHTML = html;
-      lucide.createIcons();
-    }
-
-    function exportToCSV() {
-      if (allTransactions.length === 0) return alert('目前沒有紀錄可以匯出！');
-      
-      let csv = '\uFEFF日期,類型,類別,原始金額,幣別,參考匯率,折算港幣(HKD),帳戶,備註\n';
-      allTransactions.forEach(t => {
-        csv += `"${t.date}","${t.type}","${t.category}","${t.originalAmount}","${t.currency}","${t.rate}","${t.amountHKD}","${t.account}","${(t.note || '').replace(/"/g, '""')}"\n`;
-      });
-      
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `YongSun_Memo_Export_${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    function generateBattleReport() {
-      let currBasicSpent = 0, currWasteSpent = 0, currFlexSaving = 0;
-      
-      // 1. 精準計算本月實際開支與彈性儲蓄
-      transactions.forEach(t => {
-        if (!t) return;
-        const amt = Number(t.amountHKD) || 0;
-        if (t.type === 'expense') {
-          if (basicCats.includes(t.category)) currBasicSpent += amt;
-          if (wasteCats.includes(t.category)) currWasteSpent += amt;
-        }
-        if (t.type === 'saving') {
-          // 只計算追星基金與投資 (排除緊急備用金)
-          if (t.category !== '緊急醫療備用') {
-            currFlexSaving += amt;
-          }
-        }
-      });
-
-      // 2. 結合超支倒扣機制
-      const localGachaBonus = parseFloat(localStorage.getItem(`gacha_bonus_${selectedMonthStr}`)) || 0;
-      const localWasteBudget = BUDGET.WASTE + localGachaBonus;
-      
-      const basicOverspent = Math.max(0, currBasicSpent - BUDGET.BASIC);
-      const wasteOverspent = Math.max(0, currWasteSpent - localWasteBudget);
-      
-      // 淨彈性儲蓄 = 真實主動存入 - 任何超支
-      const netFlexSaving = currFlexSaving - (basicOverspent + wasteOverspent);
-      const wasteBalance = localWasteBudget - currWasteSpent;
-      
-      const target = 3600;
-      const pct = (netFlexSaving / target) * 100;
-      
-      // 3. 更新彈窗進度條
-      document.getElementById('report-pct-text').textContent = `${Math.max(0, pct).toFixed(1)}%`;
-      
-      const reportBar = document.getElementById('report-bar');
-      if (netFlexSaving < 0) {
-        reportBar.style.width = '100%';
-        reportBar.className = 'memo-bar-fill bar-warning'; // 超支斑馬線
-      } else {
-        reportBar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
-        reportBar.className = 'memo-bar-fill bg-memo-border';
-      }
-
-      // 如果係負數透支，紅色粗體警告
-      const formattedSaving = netFlexSaving < 0 
-        ? `<span class="text-red-500 font-black">${netFlexSaving.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>`
-        : netFlexSaving.toLocaleString('en-US', {minimumFractionDigits: 2});
-        
-      document.getElementById('report-fund-detail').innerHTML = `累積: HK$ ${formattedSaving} / 目標: HK$ 3,600.00`;
-
-      // 4. 更新容仙物價局 (假設一張專輯 $150)
-      const indexText = document.getElementById('report-index-text');
-      if (wasteBalance >= 0) {
-        const albums = (wasteBalance / 150).toFixed(1);
-        indexText.innerHTML = `大發！今個月【娛樂與購物】慳落嘅錢，足足夠買 <strong class="text-lg underline decoration-2">${albums} 張實體專輯</strong> 呀！🎉`;
-      } else {
-        const albumsLost = (Math.abs(wasteBalance) / 150).toFixed(1);
-        indexText.innerHTML = `警告！今個月娛樂超支，相等於你親手撕碎咗 <strong class="text-lg underline decoration-2">${albumsLost} 張容仙專輯</strong>... 💔`;
-      }
-
-      // 5. 更新專屬結語
-      const quoteEl = document.getElementById('report-quote');
-      if (netFlexSaving < 0) {
-        quoteEl.innerHTML = `「警報！儲蓄變負數透支緊，下個月罰你聽《BLUES》冷靜一下！🚨」<br><span class="text-xs text-memo-muted block mt-2">— 皺緊眉頭的金容仙</span>`;
-      } else if (pct >= 100) {
-        quoteEl.innerHTML = `「大發！本月超額儲蓄，追星基金拉滿，離第一排又近咗啦！🎉✨」<br><span class="text-xs text-memo-muted block mt-2">— 滿意點頭的金容仙</span>`;
-      } else if (pct >= 50) {
-        quoteEl.innerHTML = `「穩定發揮！今個月有好好守住防線，荷包非常健康！💪」<br><span class="text-xs text-memo-muted block mt-2">— 俾個讚你的金容仙</span>`;
-      } else {
-        quoteEl.innerHTML = `「距離目標仲差少少，今個月要忍手唔好亂買嘢啦！🐰」<br><span class="text-xs text-memo-muted block mt-2">— 望住你個購物車的金容仙</span>`;
-      }
-
-      document.getElementById('report-modal').classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(err => console.error('SW Failed!', err));
-      });
-    }
-  </script>
+<body class="min-h-screen pb-20 antialiased selection:bg-memo-border selection:text-white">
+<header class="app-header sticky top-0 z-40">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between gap-3">
+<div class="flex items-center gap-3 min-w-0">
+<div class="brand-stamp shrink-0"><span class="text-xl">📒</span></div>
+<div class="min-w-0">
+<h1 class="font-black text-[17px] sm:text-lg tracking-tight whitespace-nowrap">My Monthly <span class="brand-chip">Memo</span></h1>
+<div class="flex items-center gap-1.5 text-[11px] text-memo-muted font-bold"><span class="w-2 h-2 rounded-full bg-white border border-memo-border inline-block" id="sync-indicator"></span><span id="sync-status">準備中...</span></div>
+</div>
+</div>
+<nav aria-label="Primary" class="hidden xl:flex items-center gap-1 ml-auto mr-2">
+<button class="top-nav-btn" data-scroll-target="overview">Overview</button>
+<button class="top-nav-btn" data-scroll-target="transactions">Transactions</button>
+<button class="top-nav-btn" data-scroll-target="wishlist">Wishlist</button>
+<button class="top-nav-btn" data-open-report="">Report</button>
+</nav>
+<div class="flex items-center gap-2 sm:gap-3">
+<div class="hidden md:flex items-center gap-2 text-sm font-black bg-[var(--paper-3)] px-3 py-2 rounded-xl"><i class="w-4 h-4" data-lucide="calendar-days"></i><select class="bg-transparent outline-none font-black cursor-pointer no-arrow" id="month-selector"></select><i class="w-3 h-3" data-lucide="chevron-down"></i></div>
+<div class="hidden lg:flex items-center gap-2 text-[11px] font-black px-3 py-2 rounded-xl border border-[var(--line)]"><i class="w-3.5 h-3.5" data-lucide="plane"></i><span>1K KRW ≈ <strong id="rate-krw-text">5.60 HKD</strong></span></div>
+<button class="memo-btn w-10 h-10 flex items-center justify-center" id="btn-theme-toggle" title="日間／Concert 夜間模式"><i class="w-4 h-4" data-lucide="moon" id="theme-moon"></i><i class="w-4 h-4 hidden" data-lucide="sun" id="theme-sun"></i></button>
+<button class="memo-btn w-10 sm:w-auto h-10 px-0 sm:px-3 flex items-center justify-center gap-1.5" id="btn-open-settings"><i class="w-4 h-4" data-lucide="settings"></i><span class="hidden sm:inline text-xs">設定</span></button>
+</div>
+</div>
+</header><button class="fixed top-[88px] right-4 sm:right-6 z-40 memo-btn bg-memo-border text-white px-4 py-3 flex items-center gap-2 shadow-[4px_4px_0_0_var(--line)]" id="btn-open-entry" title="新增手帳紀錄" type="button"><i class="w-5 h-5" data-lucide="plus"></i><span class="text-xs font-black">記一筆</span></button>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-8 space-y-7 sm:space-y-8">
+<div class="md:hidden memo-card p-3"><div class="flex items-center gap-2 font-black"><i class="w-4 h-4" data-lucide="calendar-days"></i><span class="text-xs text-memo-muted">MONTH</span><select class="bg-transparent outline-none font-black flex-1 text-right" id="month-selector-mobile"></select></div></div>
+<!-- BUDGET ENVELOPES -->
+<section aria-labelledby="budget-heading" id="overview">
+<div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-4"><div><div class="flex flex-wrap items-center gap-2 mb-2"><span class="section-kicker" id="hero-month">SEPTEMBER 2026</span><span class="tag-pill text-[10px] font-black" id="hero-days">— DAYS LEFT</span></div><h2 class="text-2xl font-black mt-1" id="budget-heading">今個月四個錢包</h2><p class="text-sm font-bold text-memo-muted mt-1">一開 App 先睇四個錢包仲剩幾多，再決定今日點洗。</p></div><div class="text-[10px] font-black tag-pill self-start" id="budget-mode-badge">預算載入中...</div></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+<article class="budget-envelope basic"><div class="mini-label">01 / Essentials</div><div class="flex justify-between items-start gap-2 mt-2"><h3 class="font-black">🥪 基本與固定</h3><span class="text-[10px] font-black text-memo-muted text-right" id="basic-status-text"></span></div><div class="text-2xl font-black mt-5" id="basic-remaining">仲可以洗 HK$ 0</div><div class="memo-bar-bg mt-4"><div class="memo-bar-fill w-0" id="basic-bar"></div></div><div class="text-[11px] font-black text-memo-muted mt-2" id="basic-ratio">0 / 0 HKD</div></article>
+<article class="budget-envelope fun"><div class="mini-label">02 / Fun money</div><div class="flex justify-between items-start gap-2 mt-2"><h3 class="font-black">✨ 娛樂與購物</h3><span class="text-[10px] font-black text-memo-muted text-right" id="gacha-status-text"></span></div><div class="text-2xl font-black mt-5" id="gacha-remaining">仲可以洗 HK$ 0</div><div class="memo-bar-bg mt-4"><div class="memo-bar-fill w-0" id="gacha-bar"></div></div><div class="text-[11px] font-black text-memo-muted mt-2" id="gacha-ratio">0 / 0 HKD</div></article>
+<article class="budget-envelope flex"><div class="mini-label">03 / Future</div><div class="flex justify-between items-start gap-2 mt-2"><h3 class="font-black">✈️ 彈性儲蓄</h3><span class="text-[10px] font-black text-memo-muted text-right" id="flex-status-text"></span></div><div class="text-2xl font-black mt-5" id="flex-remaining">距離目標 HK$ 0</div><div class="memo-bar-bg mt-4"><div class="memo-bar-fill w-0" id="flex-bar"></div></div><div class="text-[11px] font-black text-memo-muted mt-2" id="flex-ratio">0 / 0 HKD</div></article>
+<article class="budget-envelope urgent"><div class="mini-label">04 / Safety net</div><div class="flex justify-between items-start gap-2 mt-2"><h3 class="font-black">🚑 緊急備用</h3><span class="text-[10px] font-black text-memo-muted text-right" id="urgent-status-text"></span></div><div class="text-2xl font-black mt-5" id="urgent-remaining">距離目標 HK$ 0</div><div class="memo-bar-bg mt-4"><div class="memo-bar-fill w-0" id="urgent-bar"></div></div><div class="text-[11px] font-black text-memo-muted mt-2" id="urgent-ratio">0 / 0 HKD</div></article>
+</div>
+</section><section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="metric-card"><div class="flex justify-between"><div><div class="mini-label">Spent</div><span class="text-sm font-black">💸 本月支出</span></div><i class="w-5 h-5 text-memo-muted" data-lucide="receipt"></i></div><div class="text-3xl font-black mt-4" id="stat-expense">HK$ 0.00</div><div class="text-xs font-bold mt-3 text-memo-muted" id="mom-expense-text">比較中...</div></div>
+<div class="metric-card"><div class="flex justify-between"><div><div class="mini-label">Reserved</div><span class="text-sm font-black">💰 未來儲備</span></div><i class="w-5 h-5 text-memo-muted" data-lucide="ticket"></i></div><div class="text-3xl font-black mt-4" id="stat-saving">HK$ 0.00</div><div class="text-xs font-bold mt-3 text-memo-muted" id="mom-saving-text">比較中...</div></div>
+</section>
+<!-- COMPACT MONEY SNAPSHOT -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+<div class="lg:col-span-6 memo-card p-5 sm:p-6">
+<div class="flex items-start justify-between gap-3">
+<div>
+<div class="mini-label">Safe to use</div>
+<h3 class="font-black text-lg mt-1">✨ 今個月真正自由使用</h3>
+</div>
+<button class="inline-flex items-center gap-1 text-xs font-black text-memo-muted hover:text-memo-text" id="btn-toggle-balance" title="顯示／隱藏金額"><i class="w-4 h-4" data-lucide="eye" id="icon-eye"></i><i class="w-4 h-4 hidden" data-lucide="eye-off" id="icon-eye-off"></i><span>Privacy</span></button>
+</div>
+<div class="text-3xl sm:text-4xl font-black mt-4 tracking-tight" id="stat-safe-balance">HK$ 0.00</div>
+<div class="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-[11px] font-black text-memo-muted"><span>收入 <strong class="text-memo-text" id="stat-income">HK$ 0.00</strong></span><span>帳面餘額 <strong class="text-memo-text" id="stat-balance">HK$ 0.00</strong></span></div>
+<p class="text-[11px] font-bold text-memo-muted mt-3">已預留未完成嘅基本開支、彈性儲蓄同緊急備用目標。</p>
+</div>
+<div class="lg:col-span-6 safe-card p-5 sm:p-6">
+<div class="mini-label">Safe spending today</div>
+<div class="flex items-start justify-between gap-3 mt-1"><div><h3 class="font-black text-lg">🪙 今日仲可以洗幾多？</h3><div class="text-3xl sm:text-4xl font-black mt-4" id="safe-daily-spend">HK$ 0 / day</div></div></div>
+<div class="text-xs font-bold text-memo-muted mt-3">娛樂與購物仲剩 <strong class="text-memo-text" id="safe-waste-left">HK$ 0</strong>。只按娛樂預算平均，唔會叫你慳飯錢。</div>
+</div>
+
+</section>
+<div class="sticky-note px-5 py-4 flex gap-3 items-start"><div class="text-xl shrink-0">🐰</div><div class="min-w-0"><div class="mini-label mb-1">Yongsun's note</div><p class="text-sm font-bold leading-relaxed" id="solar-quote">「木木啊～今天有好好吃飯嗎？🍚✨」</p></div></div>
+<div class="hidden paper-card p-6 relative overflow-hidden" id="rollover-alert">
+<button class="absolute top-3 right-3 text-memo-muted hover:text-red-500 p-1" id="btn-close-rollover"><i class="w-5 h-5" data-lucide="x"></i></button>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-5 pr-6"><div class="flex items-start gap-4"><div class="w-12 h-12 rounded-xl bg-[var(--butter)] flex items-center justify-center shrink-0"><i class="w-6 h-6" data-lucide="heart-handshake"></i></div><div><div class="mini-label">Last month reward</div><h3 class="text-lg font-black mt-1">📝 忍手成功嘅獎勵！</h3><div class="flex items-center gap-2 mt-1"><span class="text-sm font-bold text-memo-muted">上月【娛樂與購物】慳返 HK$</span><input class="w-28 memo-input !py-1 !px-2 text-lg" id="rollover-amount-input" type="number" value="0"/></div></div></div><div class="flex flex-wrap gap-3"><button class="memo-btn px-4 py-2.5 text-xs" id="btn-claim-gacha">及時行樂 → 本月娛樂</button><button class="memo-btn px-4 py-2.5 text-xs bg-memo-border text-white" id="btn-claim-base">轉入追星基金 ✈️</button></div></div>
+</div>
+<!-- TRANSACTIONS -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-7" id="transactions">
+
+
+<div class="lg:col-span-12 memo-card p-6"><div class="flex flex-col gap-4 border-b border-[var(--line)] pb-5"><div class="flex items-end justify-between"><div><div class="section-kicker">Ledger</div><h2 class="text-xl font-black mt-1">🗃️ 歷史手帳紀錄</h2></div><span class="text-xs font-black text-memo-muted" id="history-count"></span></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-3"><input class="memo-input py-2 text-sm" id="tx-search" placeholder="搜尋分類／備註..." type="search"/><select class="memo-input py-2 text-sm" id="filter-category"><option value="all">全部分類</option></select><select class="memo-input py-2 text-sm" id="filter-account"><option value="all">全部支付方式</option><option value="信用卡">信用卡</option><option value="現金">現金</option><option value="銀行轉帳">銀行轉帳/FPS</option><option value="八達通/電子錢包">八達通/PayMe</option></select></div></div><div class="flex items-center gap-2 py-4 overflow-x-auto text-xs font-black"><button class="filter-btn memo-btn bg-memo-border text-white px-3 py-2" data-filter="all">全部</button><button class="filter-btn memo-btn px-3 py-2" data-filter="expense">支出</button><button class="filter-btn memo-btn px-3 py-2" data-filter="fixed">固定</button><button class="filter-btn memo-btn px-3 py-2" data-filter="income">入帳</button><button class="filter-btn memo-btn px-3 py-2" data-filter="saving">儲蓄</button></div><div class="space-y-3 overflow-y-auto max-h-[680px] pr-1 custom-scrollbar" id="tx-list"></div></div></section>
+<!-- MONTHLY TOTALS -->
+
+<!-- FORECAST -->
+<section class="forecast-ticket p-6 sm:p-7">
+<div class="flex items-center justify-between"><div><div class="section-kicker">Month-end forecast</div><h3 class="font-black text-xl mt-1">🔮 月底預測票</h3></div><span class="font-mono text-[10px] text-memo-muted">MMM / FORECAST</span></div>
+<div class="ticket-rule mt-5 pt-5 grid grid-cols-2 md:grid-cols-4 gap-5"><div><div class="mini-label">Days left</div><div class="text-2xl font-black mt-1" id="forecast-days">—</div></div><div><div class="mini-label">Daily avg.</div><div class="text-2xl font-black mt-1" id="forecast-daily">—</div></div><div><div class="mini-label">Month-end spend</div><div class="text-2xl font-black mt-1" id="forecast-expense">—</div></div><div><div class="mini-label">Net flex saving</div><div class="text-2xl font-black mt-1" id="forecast-saving">—</div></div></div>
+<p class="text-xs font-bold text-memo-muted mt-5" id="forecast-comment"></p>
+</section>
+<!-- LOWER INSIGHTS / QUICK ACTIONS -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+<div class="lg:col-span-8 memo-card p-6 sm:p-7"><div class="flex items-end justify-between mb-6 gap-3"><div><div class="section-kicker">Expense mix</div><h2 class="text-2xl font-black mt-1">今個月錢去咗邊？</h2></div><span class="text-xs font-black tag-pill" id="category-total">HK$ 0</span></div><div class="space-y-4" id="category-breakdown"></div></div>
+<div class="lg:col-span-4 quick-card p-6"><div class="section-kicker">Quick actions</div><h3 class="font-black text-xl mt-1">⚡ 快捷操作</h3><div class="grid grid-cols-2 gap-3 mt-5"><button class="memo-btn py-3 text-xs" id="btn-duplicate-last">複製上一筆</button><button class="memo-btn py-3 text-xs bg-memo-border text-white" onclick="generateBattleReport()">本月戰報</button><button class="memo-btn py-3 text-xs" id="btn-manual-sync">刷新雲端</button><button class="memo-btn py-3 text-xs" id="btn-export-csv">匯出 CSV</button></div></div>
+</section>
+<!-- WISHLIST -->
+<section class="memo-card p-6 sm:p-7 space-y-5" id="wishlist"><div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 border-b border-[var(--line)] pb-5"><div><div class="section-kicker">Wishlist detox / Cooling-off</div><h2 class="text-2xl font-black mt-1">🛍️ 買之前，冷靜一下先</h2><p class="text-sm font-bold text-memo-muted mt-1">放入清單唔代表一定要買。等幾日，再問自己係「真係想要」定「一時上頭」。</p></div><span class="text-[10px] font-black tag-pill self-start">COOLING PERIOD</span></div>
+<form class="grid grid-cols-1 sm:grid-cols-12 gap-3" id="tobuy-form"><input class="memo-input sm:col-span-5" id="tobuy-input" placeholder="想買咩？例如：Solar concert hoodie" required="" type="text"/><input class="memo-input sm:col-span-3" id="tobuy-price" min="0" placeholder="預計 HK$" step="any" type="number"/><select class="memo-input sm:col-span-2" id="tobuy-category"><option>周邊</option><option>娛樂</option><option>衣服</option><option>保養護膚</option><option>其他</option></select><button class="memo-btn bg-memo-border text-white sm:col-span-2" type="submit">加入清單</button></form>
+<div class="flex flex-wrap items-center gap-2 text-xs font-bold text-memo-muted"><span>冷靜期：</span><select class="memo-input !w-auto !py-1.5" id="cooling-days"><option value="3">3日</option><option selected="" value="7">7日</option><option value="14">14日</option><option value="30">30日</option></select><span>忍手成功後，可以選擇將同額真正撥入追星基金。</span></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-2" id="tobuy-list-container"></div>
+</section>
+</main>
+<!-- Mobile app navigation -->
+<nav aria-label="Mobile navigation" class="md:hidden fixed bottom-3 left-1/2 -translate-x-1/2 z-50 floating-bottom-nav rounded-[20px] px-2 py-1.5 flex items-center gap-1">
+<button class="bottom-nav-btn" data-scroll-target="overview"><i class="w-4 h-4" data-lucide="home"></i><span>首頁</span></button>
+<button class="bottom-nav-btn" data-scroll-target="transactions"><i class="w-4 h-4" data-lucide="receipt-text"></i><span>紀錄</span></button>
+<button aria-label="新增紀錄" class="bottom-add" id="btn-open-entry-mobile"><i class="w-6 h-6" data-lucide="plus"></i></button>
+<button class="bottom-nav-btn" data-scroll-target="wishlist"><i class="w-4 h-4" data-lucide="shopping-bag"></i><span>待買</span></button>
+<button class="bottom-nav-btn" data-open-report=""><i class="w-4 h-4" data-lucide="bar-chart-3"></i><span>戰報</span></button>
+</nav>
+<!-- Battle Report -->
+<div class="fixed inset-0 z-[70] bg-stone-950/55 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 hidden" id="entry-modal"><div class="w-full max-w-xl max-h-[92vh] overflow-y-auto"><div class="memo-card entry-card p-6" id="entry-card"><div class="flex justify-between items-center border-b border-[var(--line)] pb-4 mb-6"><div><div class="section-kicker">New entry</div><h2 class="text-xl font-black mt-1">✏️ <span id="entry-title">新增手帳紀錄</span></h2></div><div class="flex items-center gap-3"><button class="hidden text-xs font-black underline" id="btn-cancel-edit">取消修改</button><button class="p-2 rounded-xl hover:bg-[var(--paper-3)]" id="btn-close-entry-modal" title="關閉" type="button"><i class="w-5 h-5" data-lucide="x"></i></button></div></div>
+<form class="space-y-5" id="tx-form">
+<div><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">類型</label><div class="grid grid-cols-2 gap-3"><button class="type-btn active memo-btn py-3 text-sm" data-type="expense" type="button">💸 日常支出</button><button class="type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none" data-type="fixed" type="button">📌 固定支出</button><button class="type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none" data-type="income" type="button">💰 入帳</button><button class="type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none" data-type="saving" type="button">🐷 儲蓄</button></div><input id="tx-type" type="hidden" value="expense"/><input id="editing-id" type="hidden" value=""/></div>
+<div><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">金額與幣別</label><div class="flex rounded-xl overflow-hidden border border-[var(--line)] bg-[var(--paper-2)] amount-field"><select class="bg-[var(--paper-3)] text-sm font-black px-4 py-3 outline-none border-r border-[var(--line)]" id="tx-currency"><option>HKD</option><option>KRW</option><option>JPY</option><option>USD</option></select><input class="flex-1 min-w-0 bg-transparent px-4 py-3 text-lg font-black outline-none" id="tx-amount" min="0" placeholder="0.00" required="" step="any" type="number"/></div><div class="hidden mt-3 px-4 py-3 bg-[var(--paper-3)] rounded-xl text-xs font-black flex justify-between" id="conversion-preview"><span>折合港幣：</span><span id="preview-hkd-val">HK$ 0.00</span></div></div>
+<div class="flex gap-3"><div class="flex-1 min-w-0"><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">分類</label><select class="memo-input" id="tx-category"></select></div><div class="w-[145px] shrink-0"><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">日期</label><input class="memo-input px-2" id="tx-date" required="" type="date"/></div></div>
+<div class="flex flex-col sm:flex-row gap-4"><div class="sm:w-[160px] shrink-0"><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">支付方式</label><select class="memo-input" id="tx-account"><option value="信用卡">信用卡</option><option value="現金">現金</option><option value="銀行轉帳">銀行轉帳/FPS</option><option value="八達通/電子錢包">八達通/PayMe</option></select></div><div class="flex-1"><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">備註說明</label><input class="memo-input" id="tx-note" placeholder="例如：買了金容仙新專..." type="text"/></div></div>
+<button class="w-full memo-btn bg-memo-border text-white text-base py-4" id="btn-submit" type="submit"><span id="btn-submit-text">✓ 幫我入帳！</span></button>
+</form>
+</div></div></div><div class="fixed inset-0 z-50 bg-stone-950/55 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 hidden" id="report-modal"><div class="report-sheet w-full max-w-3xl max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-7"><div class="flex items-start justify-between border-b border-[var(--line)] pb-5"><div><div class="section-kicker">Monthly settlement</div><h3 class="text-2xl sm:text-3xl font-black mt-1">📊 本月戰報</h3><p class="text-xs font-bold text-memo-muted mt-1">花咗幾多唔係唯一答案；最重要係有冇跟到自己原本嘅分配。</p></div><button class="p-2 rounded-xl hover:bg-[var(--paper-3)]" data-close="report-modal"><i class="w-6 h-6" data-lucide="x"></i></button></div><div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="report-summary-grid"></div><div><div class="flex justify-between items-end mb-2"><div><div class="mini-label">Flexible saving</div><span class="text-sm font-black">✈️ 淨彈性儲蓄達標率</span></div><span class="text-xs font-black tag-pill" id="report-pct-text">0%</span></div><div class="memo-bar-bg"><div class="memo-bar-fill w-0" id="report-bar"></div></div><p class="text-xs font-bold text-memo-muted mt-2" id="report-fund-detail"></p></div><div class="p-5 rounded-2xl report-highlight border border-[var(--line)]"><div class="mini-label mb-2">Yongsun Price Bureau</div><h4 class="text-sm font-black mb-1">🛍️ 容仙物價局分析</h4><p class="text-sm font-bold leading-relaxed" id="report-index-text"></p></div><div><div class="section-kicker mb-2">Month on month</div><h4 class="text-lg font-black mb-3">📅 月對月比較</h4><div class="overflow-x-auto report-table" id="report-mom-table"></div></div><div class="sticky-note p-5 flex gap-3"><div class="text-3xl">🐰</div><div><div class="mini-label mb-1">Closing note</div><p class="text-sm font-black leading-relaxed" id="report-quote"></p></div></div></div></div>
+<!-- Settings -->
+<div class="fixed inset-0 z-50 bg-stone-950/55 backdrop-blur-sm flex items-center justify-center p-4 hidden" id="settings-modal"><div class="memo-card w-full max-w-2xl max-h-[90vh] overflow-y-auto p-7 space-y-6"><div class="flex items-center justify-between border-b border-[var(--line)] pb-4"><h3 class="text-xl font-black">⚙️ App 設定</h3><button data-close="settings-modal"><i class="w-6 h-6" data-lucide="x"></i></button></div><div><label class="block text-xs font-black uppercase mb-2">Google Apps Script API 網址</label><input class="memo-input" id="api-url-input" placeholder="https://script.google.com/macros/s/.../exec" type="url"/></div><div class="border-t border-dashed border-[var(--line)] pt-5"><div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><div><h4 class="font-black">本月預算設定</h4><p class="text-xs font-bold text-memo-muted">百分比模式會以參考月收入自動計算四個目標。</p></div><select class="memo-input sm:w-52" id="budget-mode"><option value="percent">收入百分比模式</option><option value="fixed">固定 HK$ 模式</option></select></div><div class="mt-4 space-y-4" id="percent-budget-fields"><div><label class="mini-label">參考月收入 HK$</label><input class="memo-input mt-1" id="budget-income" min="0" type="number"/></div><div class="grid grid-cols-2 sm:grid-cols-4 gap-3"><div><label class="mini-label">基本 %</label><input class="memo-input mt-1" id="budget-basic-pct" min="0" type="number"/></div><div><label class="mini-label">娛樂 %</label><input class="memo-input mt-1" id="budget-waste-pct" min="0" type="number"/></div><div><label class="mini-label">彈性儲蓄 %</label><input class="memo-input mt-1" id="budget-flex-pct" min="0" type="number"/></div><div><label class="mini-label">緊急 %</label><input class="memo-input mt-1" id="budget-urgent-pct" min="0" type="number"/></div></div><div class="text-xs font-black" id="budget-pct-warning"></div></div><div class="hidden mt-4 grid grid-cols-2 gap-3" id="fixed-budget-fields"><div><label class="mini-label">基本 HK$</label><input class="memo-input mt-1" id="budget-basic-fixed" min="0" type="number"/></div><div><label class="mini-label">娛樂 HK$</label><input class="memo-input mt-1" id="budget-waste-fixed" min="0" type="number"/></div><div><label class="mini-label">彈性儲蓄 HK$</label><input class="memo-input mt-1" id="budget-flex-fixed" min="0" type="number"/></div><div><label class="mini-label">緊急 HK$</label><input class="memo-input mt-1" id="budget-urgent-fixed" min="0" type="number"/></div></div></div><div><label class="mini-label">大額支出確認門檻 HK$</label><input class="memo-input mt-1" id="large-expense-threshold" min="0" type="number"/></div><button class="w-full memo-btn bg-memo-border text-white py-3" id="btn-save-settings">儲存設定</button></div></div>
+<div class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[80] w-[min(92vw,520px)] space-y-2" id="toast-container"></div>
+<script>
+const DEFAULT_BUDGET = {mode:'percent', income:18000, basicPct:40, wastePct:25, flexPct:20, urgentPct:15, basicFixed:7200, wasteFixed:4500, flexFixed:3600, urgentFixed:2700, largeExpenseThreshold:1000};
+const categories={expense:['餐飲','交通','周邊','娛樂','衣服','保養護膚','其他日常'],fixed:['房租','Fromm訂閱','電話費/上網','其他固定'],income:['打工/薪水','股息回報','其他收入'],saving:['追星基金','投資','緊急醫療備用']};
+const basicCats=['餐飲','交通','其他日常'];
+const fixedCats=categories.fixed;
+const wasteCats=['周邊','娛樂','衣服','保養護膚'];
+const expenseCats=[...categories.expense,...categories.fixed];
+const solarQuotes=["「木木啊～今天有好好吃飯嗎？🍚✨」","「努力存錢的木木最帥氣了！摸摸頭～💪🐰❤️」","「辛苦啦！今天也為了見我而努力忍住物慾了對吧？🥺✈️」","「金容仙正在看著你的錢包...👀💸」","「唔好為咗慳錢餓親自己呀！要食得飽飽先有氣力嗌應援㗎！🍱💪」","「每慳一蚊，我哋喺簽售會對視嘅時間就好似多咗一秒咁！👀💕」","「무무야! 또 쓸데없는 거 사려고? 그 돈 모아서 나 보러 와야지! 🤨」","「돈 모으는 것도 중요한데, 밥은 잘 챙겨 먹고 있는 거지? 아프면 혼나! 🍚😡」"];
+let exchangeRates={HKD:1,KRW:.0056,JPY:.051,USD:7.82};
+let apiUrl=localStorage.getItem('smartspend_api_url')||'';
+let allTransactions=safeParse(localStorage.getItem('smartspend_records'),[]);
+let toBuyItems=safeParse(localStorage.getItem('memo_tobuy_items'),[]);
+let selectedMonthStr=localMonth(new Date()).slice(0,7),transactions=[],currentFilter='all',searchTerm='',categoryFilter='all',accountFilter='all',lastDeleted=null;
+let budgetConfig={...DEFAULT_BUDGET,...safeParse(localStorage.getItem('memo_budget_config'),{})};
+
+function safeParse(raw,fallback){try{const x=JSON.parse(raw);return x??fallback}catch{return fallback}}
+function localMonth(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
+function fmt(n,d=2){return 'HK$ '+(Number(n)||0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function num(n){return Number(n)||0}
+function getBudgetTargets(){if(budgetConfig.mode==='fixed')return{basic:num(budgetConfig.basicFixed),waste:num(budgetConfig.wasteFixed),flex:num(budgetConfig.flexFixed),urgent:num(budgetConfig.urgentFixed)};const income=num(budgetConfig.income);return{basic:income*num(budgetConfig.basicPct)/100,waste:income*num(budgetConfig.wastePct)/100,flex:income*num(budgetConfig.flexPct)/100,urgent:income*num(budgetConfig.urgentPct)/100}}
+function isBasicCategory(cat){return basicCats.includes(cat)||fixedCats.includes(cat)}
+function getLastMonthString(s){const[y,m]=s.split('-').map(Number);const d=new Date(y,m-2,1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
+function getMonthMeta(s){const[y,m]=s.split('-').map(Number),days=new Date(y,m,0).getDate(),today=new Date(),current=localMonth(today).slice(0,7);let elapsed=days,remaining=0;if(s===current){elapsed=today.getDate();remaining=Math.max(0,days-elapsed)}else if(s>current){elapsed=0;remaining=days}return{days,elapsed,remaining,isCurrent:s===current,isFuture:s>current}}
+function updateSyncStatus(state,text){const d=document.getElementById('sync-indicator'),l=document.getElementById('sync-status');if(l)l.textContent=text;if(!d)return;d.className=state===true?'w-2.5 h-2.5 bg-memo-border border-2 border-memo-border inline-block':state===false?'w-2.5 h-2.5 bg-white border-2 border-memo-border inline-block':'w-2.5 h-2.5 bg-slate-400 border-2 border-memo-border animate-pulse inline-block'}
+function saveLocal(){localStorage.setItem('smartspend_records',JSON.stringify(allTransactions))}
+function saveToBuy(){localStorage.setItem('memo_tobuy_items',JSON.stringify(toBuyItems))}
+function showToast(message,actionLabel,actionFn){const c=document.getElementById('toast-container'),id='t'+Date.now();const div=document.createElement('div');div.id=id;div.className='toast memo-card px-4 py-3 flex items-center justify-between gap-3 bg-white';div.innerHTML=`<span class="text-sm font-black">${message}</span>${actionLabel?`<button class="text-xs font-black underline" id="${id}-action">${actionLabel}</button>`:''}`;c.appendChild(div);if(actionLabel)document.getElementById(`${id}-action`).onclick=()=>{actionFn?.();div.remove()};setTimeout(()=>div.remove(),6500)}
+async function postCloud(payload){if(!apiUrl)return;try{updateSyncStatus(null,'傳輸中...');await fetch(apiUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});updateSyncStatus(true,'同步成功')}catch{updateSyncStatus(false,'雲端失敗・已留本地')}}
+async function fetchLiveRates(){try{const r=await fetch('https://open.er-api.com/v6/latest/HKD');if(!r.ok)return;const d=await r.json();if(d?.rates){exchangeRates.KRW=+(1/d.rates.KRW).toFixed(6);exchangeRates.JPY=+(1/d.rates.JPY).toFixed(5);exchangeRates.USD=+(1/d.rates.USD).toFixed(4);document.getElementById('rate-krw-text').textContent=`${(exchangeRates.KRW*1000).toFixed(2)} HKD`}}catch{}}
+async function syncFromCloud(){if(!apiUrl){updateSyncStatus(false,'尚未連線');renderAll();return}updateSyncStatus(null,'同步中...');try{const res=await fetch(apiUrl+(apiUrl.includes('?')?'&':'?')+'t='+Date.now());if(!res.ok)throw 0;const data=JSON.parse(await res.text());if(data?.transactions){allTransactions=data.transactions.map(normalizeTx);if(Array.isArray(data.tobuy)){toBuyItems=data.tobuy;migrateToBuy()}}else if(Array.isArray(data)){allTransactions=data.map(normalizeTx)}else throw 0;saveLocal();saveToBuy();updateSyncStatus(true,'同步成功')}catch(e){updateSyncStatus(false,'同步失敗・使用本地資料')}finally{initMonthSelector();filterDataByMonth();renderAll()}}
+function normalizeTx(t){if(!t)return t;let date=t.date;if(date){const d=new Date(date);if(!isNaN(d))date=localMonth(d)}return{...t,date,amountHKD:num(t.amountHKD),originalAmount:num(t.originalAmount),rate:num(t.rate)||1}}
+function filterDataByMonth(){transactions=allTransactions.filter(t=>t?.date?.startsWith(selectedMonthStr))}
+function initMonthSelector(){const set=new Set([localMonth(new Date()).slice(0,7),selectedMonthStr]);allTransactions.forEach(t=>t?.date&&set.add(t.date.slice(0,7)));const months=[...set].sort((a,b)=>b.localeCompare(a));['month-selector','month-selector-mobile'].forEach(id=>{const s=document.getElementById(id);if(!s)return;s.innerHTML=months.map(m=>`<option value="${m}" ${m===selectedMonthStr?'selected':''}>${m.replace('-',' . ')}</option>`).join('');s.onchange=e=>{selectedMonthStr=e.target.value;const other=document.getElementById(id==='month-selector'?'month-selector-mobile':'month-selector');if(other)other.value=selectedMonthStr;filterDataByMonth();renderAll()}})}
+function randomizeQuote(){document.getElementById('solar-quote').textContent=solarQuotes[Math.floor(Math.random()*solarQuotes.length)]}
+
+function computeMonth(month=selectedMonthStr){const arr=allTransactions.filter(t=>t?.date?.startsWith(month));let expense=0,income=0,saving=0,basic=0,waste=0,flex=0,urgent=0;const byCat={};arr.forEach(t=>{const a=num(t.amountHKD);if(t.type==='expense'){expense+=a;byCat[t.category]=(byCat[t.category]||0)+a;if(isBasicCategory(t.category))basic+=a;if(wasteCats.includes(t.category))waste+=a}else if(t.type==='income')income+=a;else if(t.type==='saving'){saving+=a;if(t.category==='緊急醫療備用')urgent+=a;else flex+=a}});const b=getBudgetTargets(),bonus=num(localStorage.getItem(`gacha_bonus_${month}`)),wasteBudget=b.waste+bonus,basicOver=Math.max(0,basic-b.basic),wasteOver=Math.max(0,waste-wasteBudget),netFlex=flex-basicOver-wasteOver;return{arr,expense,income,saving,basic,waste,flex,urgent,byCat,bonus,wasteBudget,basicOver,wasteOver,netFlex,balance:income-expense-saving}}
+
+function setBar(name,value,target,texts){const pct=target>0?value/target*100:0,bar=document.getElementById(name+'-bar'),ratio=document.getElementById(name+'-ratio'),status=document.getElementById(name+'-status-text');if(bar){bar.style.width=`${Math.min(100,Math.max(0,pct))}%`;bar.className='memo-bar-fill'+(pct>=85?' bar-warning':'')}if(ratio)ratio.textContent=`${num(value).toLocaleString()} / ${num(target).toLocaleString()} HKD`;if(status)status.textContent=pct>=100?texts[2]:pct>=60?texts[1]:texts[0];return pct}
+function renderDashboard(){const c=computeMonth(),last=computeMonth(getLastMonthString(selectedMonthStr)),b=getBudgetTargets(),meta=getMonthMeta(selectedMonthStr),hide=localStorage.getItem('hide_balance')==='true';document.getElementById('budget-mode-badge').textContent=budgetConfig.mode==='fixed'?'固定 HK$ 預算模式':`百分比模式・參考收入 ${fmt(budgetConfig.income,0)}`;const [hy,hm]=selectedMonthStr.split('-').map(Number),monthName=new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric'}).format(new Date(hy,hm-1,1)).toUpperCase();document.getElementById('hero-month').textContent=monthName;document.getElementById('hero-days').textContent=meta.isCurrent?`${meta.remaining} DAYS LEFT`:meta.isFuture?`${meta.days} DAYS PLANNED`:'MONTH CLOSED';
+  document.getElementById('stat-expense').textContent=fmt(c.expense);document.getElementById('stat-saving').textContent=fmt(c.saving);document.getElementById('stat-balance').textContent=hide?'HK$ *****':fmt(c.balance);document.getElementById('stat-income').textContent=hide?'HK$ *****':fmt(c.income);
+  const safeBalance=c.balance-Math.max(0,b.basic-c.basic)-Math.max(0,b.flex-c.flex)-Math.max(0,b.urgent-c.urgent);document.getElementById('stat-safe-balance').textContent=hide?'HK$ *****':fmt(safeBalance);
+  document.getElementById('icon-eye').classList.toggle('hidden',hide);document.getElementById('icon-eye-off').classList.toggle('hidden',!hide);
+  const ed=c.expense-last.expense,sd=c.saving-last.saving;document.getElementById('mom-expense-text').textContent=last.expense===0?'上個月無資料比較':ed>0?`比上月多洗 ${fmt(ed)}`:ed<0?`比上月慳咗 ${fmt(Math.abs(ed))} 🎉`:'同上月一樣';document.getElementById('mom-saving-text').textContent=last.saving===0?'上月無儲蓄紀錄':sd>=0?`比上月多儲 ${fmt(sd)} ✨`:`比上月少儲 ${fmt(Math.abs(sd))}`;
+  setBar('basic',c.basic,b.basic,['日常食飽飽，先有力追星！','開始接近預算上限喇。','基本開支已達／超預算！']);setBar('gacha',c.waste,c.wasteBudget,['荷包好聽話，繼續保持！','金容仙警告：收手啦！','娛樂預算見底！']);
+  const flexPct=b.flex>0?c.netFlex/b.flex*100:0,fb=document.getElementById('flex-bar'),flexGap=Math.max(0,b.flex-c.netFlex);fb.style.width=c.netFlex<0?'100%':`${Math.min(100,Math.max(0,flexPct))}%`;fb.className=c.netFlex<0?'memo-bar-fill bar-warning':'memo-bar-fill bg-slate-400';document.getElementById('flex-remaining').innerHTML=c.netFlex<0?`倒扣後 <span class="text-red-500">${fmt(c.netFlex,0)}</span>`:`已儲 ${fmt(c.netFlex,0)}`;document.getElementById('flex-ratio').textContent=`目標 ${fmt(b.flex,0)} · ${Math.max(0,flexPct).toFixed(0)}%`;document.getElementById('flex-status-text').textContent=c.netFlex<0?`🚨 超支倒扣 ${fmt(Math.abs(c.netFlex),0)}`:c.netFlex>=b.flex?'已達標 ✈️':`仲差 ${fmt(flexGap,0)}`;
+  setBar('urgent',c.urgent,b.urgent,['安全網建立中','保命金已過半 🧱','保命金達標 🛡️']);
+  document.getElementById('basic-remaining').textContent=`仲可以洗 ${fmt(Math.max(0,b.basic-c.basic),0)}`;document.getElementById('gacha-remaining').textContent=`仲可以洗 ${fmt(Math.max(0,c.wasteBudget-c.waste),0)}`;document.getElementById('urgent-remaining').textContent=`距離目標 ${fmt(Math.max(0,b.urgent-c.urgent),0)}`;
+  const elapsed=Math.max(1,meta.elapsed),projectExpense=meta.isFuture?0:meta.isCurrent?c.expense/elapsed*meta.days:c.expense,projectSaving=meta.isFuture?0:meta.isCurrent?c.netFlex/elapsed*meta.days:c.netFlex;document.getElementById('forecast-days').textContent=meta.isCurrent?`${meta.remaining} 日`:meta.isFuture?`${meta.days} 日`:'已完結';document.getElementById('forecast-daily').textContent=meta.isFuture?'—':fmt(c.expense/elapsed,0);document.getElementById('forecast-expense').textContent=fmt(projectExpense,0);document.getElementById('forecast-saving').textContent=fmt(projectSaving,0);document.getElementById('forecast-comment').textContent=meta.isCurrent?(projectExpense<=b.basic+c.wasteBudget?'照目前速度，整體消費仍在主要支出預算範圍內。':'照目前速度，月底可能高過基本＋娛樂預算，要開始收手。'):(meta.isFuture?'未到呢個月份，暫時唔做預測。':'呢個月已完結，所以顯示實際結果。');
+  const wasteLeft=Math.max(0,c.wasteBudget-c.waste),daysForSafe=meta.isCurrent?meta.remaining+1:meta.isFuture?meta.days:0;document.getElementById('safe-waste-left').textContent=fmt(wasteLeft,0);document.getElementById('safe-daily-spend').textContent=daysForSafe?`${fmt(wasteLeft/daysForSafe,0)} / day`:'—';
+  renderCategoryBreakdown(c);renderRollover(last);renderList();}
+function renderCategoryBreakdown(c){
+  const box=document.getElementById('category-breakdown'),entries=Object.entries(c.byCat).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('category-total').textContent=fmt(c.expense,0);
+  if(!entries.length){box.innerHTML='<p class="text-sm font-bold text-memo-muted text-center py-6">今個月未有支出資料。</p>';return}
+  const max=entries[0][1]||1;
+  box.innerHTML=entries.map(([cat,val],i)=>`<div class="chart-row"><span class="text-sm font-black">${cat}</span><div class="chart-track"><div class="chart-fill chart-tone-${i%5}" style="width:${val/max*100}%"></div></div><span class="chart-amount text-xs font-black text-right whitespace-nowrap">${fmt(val,0)} · ${c.expense?Math.round(val/c.expense*100):0}%</span></div>`).join('')
+}
+function renderRollover(last){const prev=getLastMonthString(selectedMonthStr),claimed=localStorage.getItem(`rollover_claimed_${prev}`),remaining=last.wasteBudget-last.waste,alert=document.getElementById('rollover-alert');if(!claimed&&remaining>0&&last.arr.length){document.getElementById('rollover-amount-input').value=remaining.toFixed(2);alert.classList.remove('hidden')}else alert.classList.add('hidden')}
+
+function renderCategoryOptions(type,selected){const s=document.getElementById('tx-category'),opts=categories[type]||[];s.innerHTML=opts.map(x=>`<option value="${x}" ${x===selected?'selected':''}>${x}</option>`).join('')}
+function setType(type,selectedCat){document.getElementById('tx-type').value=type;document.querySelectorAll('.type-btn').forEach(b=>{const active=b.dataset.type===type;b.className=active?'type-btn active memo-btn py-3 text-sm':'type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none'});renderCategoryOptions(type,selectedCat);updatePreview()}
+function updatePreview(){const amt=num(document.getElementById('tx-amount').value),cur=document.getElementById('tx-currency').value,box=document.getElementById('conversion-preview');if(!amt||cur==='HKD'){box.classList.add('hidden');return}box.classList.remove('hidden');document.getElementById('preview-hkd-val').textContent=fmt(amt*(exchangeRates[cur]||1))}
+function openEntryModal(reset=true){if(reset)resetEntryForm();document.getElementById('entry-modal').classList.remove('hidden');setTimeout(()=>document.getElementById('tx-amount')?.focus(),80)}
+function closeEntryModal(){document.getElementById('entry-modal').classList.add('hidden')}
+function resetEntryForm(){document.getElementById('tx-form').reset();document.getElementById('editing-id').value='';document.getElementById('entry-title').textContent='新增手帳紀錄';document.getElementById('btn-submit-text').textContent='✓ 幫我入帳！';document.getElementById('btn-cancel-edit').classList.add('hidden');document.getElementById('tx-date').value=localMonth(new Date());setType('expense');document.getElementById('conversion-preview').classList.add('hidden')}
+async function handleAddTransaction(e){e.preventDefault();const editingId=document.getElementById('editing-id').value,rawType=document.getElementById('tx-type').value,type=rawType==='fixed'?'expense':rawType,cur=document.getElementById('tx-currency').value,original=num(document.getElementById('tx-amount').value),rate=exchangeRates[cur]||1,amountHKD=+(original*rate).toFixed(2),category=document.getElementById('tx-category').value,date=document.getElementById('tx-date').value,account=document.getElementById('tx-account').value,note=document.getElementById('tx-note').value.trim();if(original<=0)return;const threshold=num(budgetConfig.largeExpenseThreshold);if(type==='expense'&&amountHKD>=threshold&&threshold>0&&!confirm(`呢筆支出係 ${fmt(amountHKD)}，超過大額確認門檻 ${fmt(threshold)}。確定入帳？`))return;const tx={id:editingId||Date.now().toString(),type,category,originalAmount:original,currency:cur,rate,amountHKD,date,account,note};if(editingId){const old=allTransactions.find(t=>t.id===editingId);allTransactions=allTransactions.map(t=>t.id===editingId?tx:t);saveLocal();await postCloud({action:'delete',id:editingId});await postCloud({action:'add',data:tx});showToast('已更新紀錄 ✓');}else{allTransactions.unshift(tx);saveLocal();postCloud({action:'add',data:tx});showToast('已入帳 ✓')}filterDataByMonth();initMonthSelector();renderAll();resetEntryForm();closeEntryModal()}
+window.editTx=function(id){const t=allTransactions.find(x=>x.id===id);if(!t)return;const raw=fixedCats.includes(t.category)?'fixed':t.type;document.getElementById('editing-id').value=id;document.getElementById('entry-title').textContent='修改手帳紀錄';document.getElementById('btn-submit-text').textContent='✓ 儲存修改';document.getElementById('btn-cancel-edit').classList.remove('hidden');setType(raw,t.category);document.getElementById('tx-currency').value=t.currency||'HKD';document.getElementById('tx-amount').value=t.originalAmount;document.getElementById('tx-date').value=t.date;document.getElementById('tx-account').value=t.account||'信用卡';document.getElementById('tx-note').value=t.note||'';updatePreview();openEntryModal(false)}
+window.duplicateTx=function(id){const t=allTransactions.find(x=>x.id===id);if(!t)return;const raw=fixedCats.includes(t.category)?'fixed':t.type;resetEntryForm();setType(raw,t.category);document.getElementById('tx-currency').value=t.currency||'HKD';document.getElementById('tx-amount').value=t.originalAmount;document.getElementById('tx-account').value=t.account||'信用卡';document.getElementById('tx-note').value=t.note?`${t.note} (複製)`:'複製上一筆';updatePreview();openEntryModal(false)}
+window.deleteTx=function(id){const idx=allTransactions.findIndex(t=>t.id===id);if(idx<0)return;const [removed]=allTransactions.splice(idx,1);lastDeleted={tx:removed,index:idx};saveLocal();filterDataByMonth();renderAll();postCloud({action:'delete',id});showToast('已刪除一筆紀錄','復原',()=>{if(!lastDeleted)return;allTransactions.splice(Math.min(lastDeleted.index,allTransactions.length),0,lastDeleted.tx);saveLocal();filterDataByMonth();renderAll();postCloud({action:'add',data:lastDeleted.tx});lastDeleted=null})}
+function renderList(){const box=document.getElementById('tx-list');let arr=transactions.filter(t=>{const fixed=fixedCats.includes(t.category);const typeOk=currentFilter==='all'||(currentFilter==='fixed'?fixed:currentFilter==='expense'?t.type==='expense':t.type===currentFilter);const q=(t.category+' '+(t.note||'')+' '+(t.account||'')).toLowerCase();return typeOk&&(categoryFilter==='all'||t.category===categoryFilter)&&(accountFilter==='all'||t.account===accountFilter)&&(!searchTerm||q.includes(searchTerm))});document.getElementById('history-count').textContent=`${arr.length} 筆`;if(!arr.length){box.innerHTML='<div class="text-center py-12 text-sm font-black text-memo-muted">搵唔到符合條件嘅紀錄。</div>';return}box.innerHTML=arr.map(item=>{const sign=item.type==='income'?'+':item.type==='saving'?'':'-',icon=item.type==='income'?'wallet':item.type==='saving'?'ticket':fixedCats.includes(item.category)?'pin':'shopping-cart',isForeign=item.currency&&item.currency!=='HKD',pain=item.type==='expense'&&wasteCats.includes(item.category)?`<div class="text-[10px] font-bold text-slate-500 mt-1">💔 約等於 ${(item.amountHKD/150).toFixed(1)} 張專輯</div>`:'';return `<div class="p-4 bg-white border-2 border-memo-border flex items-center justify-between gap-3 group"><div class="flex items-center gap-3 min-w-0"><div class="w-10 h-10 border-2 border-memo-border flex items-center justify-center shrink-0"><i data-lucide="${icon}" class="w-5 h-5"></i></div><div class="min-w-0"><div class="flex flex-wrap items-center gap-2"><span class="text-sm font-black">${item.category}</span><span class="text-[10px] px-1.5 py-0.5 border-2 border-memo-border font-black">${item.account||'—'}</span></div><div class="text-xs text-memo-muted font-bold mt-1 truncate">${item.date}${item.note?' · '+escapeHtml(item.note):''}</div>${pain}</div></div><div class="flex items-center gap-2 shrink-0"><div class="text-right"><div class="text-base sm:text-lg font-black">${sign}${fmt(item.amountHKD)}</div>${isForeign?`<div class="text-[10px] font-black text-memo-muted">${num(item.originalAmount).toLocaleString()} ${item.currency}</div>`:''}</div><div class="hidden sm:flex gap-1 opacity-70 group-hover:opacity-100"><button onclick="editTx('${item.id}')" class="border-2 border-memo-border p-1.5" title="修改"><i data-lucide="pencil" class="w-4 h-4"></i></button><button onclick="duplicateTx('${item.id}')" class="border-2 border-memo-border p-1.5" title="複製"><i data-lucide="copy" class="w-4 h-4"></i></button><button onclick="deleteTx('${item.id}')" class="border-2 border-memo-border p-1.5 hover:bg-memo-border hover:text-white" title="刪除"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div></div>`}).join('');lucide.createIcons()}
+function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function buildFilterCategories(){document.getElementById('filter-category').innerHTML='<option value="all">全部分類</option>'+[...new Set([...expenseCats,...categories.income,...categories.saving])].map(x=>`<option>${x}</option>`).join('')}
+
+function migrateToBuy(){toBuyItems=toBuyItems.filter(Boolean).map(x=>({id:x.id||Date.now().toString(),text:x.text||'',price:num(x.price),category:x.category||'其他',addedDate:x.addedDate||localMonth(new Date()),coolingDays:num(x.coolingDays)||7,status:x.status|| (x.done?'bought':'thinking'),done:!!x.done}));saveToBuy()}
+function renderToBuyList(){
+  const box=document.getElementById('tobuy-list-container');
+  if(!toBuyItems.length){box.innerHTML='<p class="text-xs font-bold text-memo-muted py-8 text-center lg:col-span-2">清單空空如也，荷包好安全！🧘‍♀️</p>';return}
+  const today=new Date();
+  box.innerHTML=toBuyItems.map(item=>{const added=new Date(item.addedDate+'T00:00:00'),passed=Math.max(0,Math.floor((today-added)/86400000)),left=Math.max(0,item.coolingDays-passed),ready=left===0,pct=Math.min(100,(passed/Math.max(1,item.coolingDays))*100),status=item.status==='resisted'?'<span class="saved-stamp">SAVED ✓</span>':item.status==='bought'?'<span class="tag-pill text-[10px] font-black">DECIDED ✓</span>':'';return `<div class="receipt-item ${item.status!=='thinking'?'opacity-70':''}"><div class="flex items-start justify-between gap-3"><div class="min-w-0"><div class="mini-label">Wishlist receipt / ${item.category}</div><div class="text-lg font-black mt-1 truncate">${escapeHtml(item.text)}</div></div><button onclick="deleteToBuy('${item.id}')" class="text-memo-muted hover:text-red-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><div class="flex items-end justify-between gap-3 mt-4"><div><div class="text-2xl font-black">${item.price?fmt(item.price,0):'未填價格'}</div><div class="text-[11px] font-bold text-memo-muted mt-1">Added ${item.addedDate}${item.price?` · 約 ${(item.price/150).toFixed(1)} 張專輯`:''}</div></div>${status}</div><div class="mt-4"><div class="flex justify-between text-[10px] font-black text-memo-muted mb-1"><span>COOLING OFF</span><span>${ready?'READY TO DECIDE':`DAY ${Math.min(passed,item.coolingDays)} / ${item.coolingDays}`}</span></div><div class="receipt-progress"><span style="width:${ready?100:pct}%"></span></div></div>${item.status==='thinking'?`<div class="flex flex-wrap gap-2 mt-4"><button onclick="buyToBuy('${item.id}')" class="memo-btn px-3 py-2 text-xs ${ready?'':'opacity-60'}">${ready?'我真係要買':'未冷靜完…但我要買'}</button><button onclick="resistToBuy('${item.id}')" class="memo-btn px-3 py-2 text-xs bg-memo-border text-white">忍手成功 ${item.price?'+'+fmt(item.price,0):''}</button></div>`:`<div class="mt-4 text-xs font-black text-memo-muted">${item.status==='resisted'?'🎉 呢筆物慾已經成功放低。':'✅ 已經冷靜期後決定購買。'}</div>`}</div>`}).join('');lucide.createIcons()
+}
+async function addToBuyItem(e){e.preventDefault();const text=document.getElementById('tobuy-input').value.trim();if(!text)return;const item={id:Date.now().toString(),text,price:num(document.getElementById('tobuy-price').value),category:document.getElementById('tobuy-category').value,addedDate:localMonth(new Date()),coolingDays:num(document.getElementById('cooling-days').value)||7,status:'thinking',done:false};toBuyItems.unshift(item);saveToBuy();renderToBuyList();e.target.reset();document.getElementById('cooling-days').value='7';postCloud({target:'tobuy',action:'add',data:item})}
+window.deleteToBuy=function(id){toBuyItems=toBuyItems.filter(x=>x.id!==id);saveToBuy();renderToBuyList();postCloud({target:'tobuy',action:'delete',id})}
+window.buyToBuy=function(id){const x=toBuyItems.find(i=>i.id===id);if(!x)return;if(!confirm('冷靜完都確定要買？買咗之後記得正式入帳支出。'))return;x.status='bought';x.done=true;saveToBuy();renderToBuyList();postCloud({target:'tobuy',action:'toggle',id,done:true})}
+window.resistToBuy=function(id){const x=toBuyItems.find(i=>i.id===id);if(!x)return;x.status='resisted';x.done=true;saveToBuy();renderToBuyList();postCloud({target:'tobuy',action:'toggle',id,done:true});if(x.price>0&&confirm(`忍手成功 ${fmt(x.price)} 🎉\n要唔要將呢筆錢真正撥入「追星基金」？`)){const tx={id:(Date.now()+1).toString(),type:'saving',category:'追星基金',originalAmount:x.price,currency:'HKD',rate:1,amountHKD:x.price,date:localMonth(new Date()),account:'銀行轉帳',note:`🛍️ 忍手成功：${x.text}`};allTransactions.unshift(tx);saveLocal();postCloud({action:'add',data:tx});filterDataByMonth();initMonthSelector();renderAll()}}
+
+async function handleRollover(action){const prev=getLastMonthString(selectedMonthStr),amount=num(document.getElementById('rollover-amount-input').value);if(amount<=0)return alert('請輸入大於 0 的金額');localStorage.setItem(`rollover_claimed_${prev}`,'true');if(action==='gacha'){localStorage.setItem(`gacha_bonus_${selectedMonthStr}`,num(localStorage.getItem(`gacha_bonus_${selectedMonthStr}`))+amount);renderAll()}else{const tx={id:Date.now().toString(),type:'saving',category:'追星基金',originalAmount:amount,currency:'HKD',rate:1,amountHKD:amount,date:localMonth(new Date()),account:'銀行轉帳',note:'📝 忍手成功嘅獎勵！！(結餘撥入)'};allTransactions.unshift(tx);saveLocal();postCloud({action:'add',data:tx});filterDataByMonth();renderAll()}}
+function exportToCSV(){if(!allTransactions.length)return alert('目前沒有紀錄可以匯出！');let csv='\uFEFF日期,類型,類別,原始金額,幣別,參考匯率,折算港幣(HKD),帳戶,備註\n';allTransactions.forEach(t=>csv+=`"${t.date}","${t.type}","${t.category}","${t.originalAmount}","${t.currency}","${t.rate}","${t.amountHKD}","${t.account||''}","${String(t.note||'').replace(/"/g,'""')}"\n`);const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`YongSun_Memo_Export_${localMonth(new Date())}.csv`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500)}
+function generateBattleReport(){const c=computeMonth(),last=computeMonth(getLastMonthString(selectedMonthStr)),b=getBudgetTargets(),pct=b.flex?c.netFlex/b.flex*100:0;document.getElementById('report-summary-grid').innerHTML=[['SPENT',c.expense,'💸'],['ESSENTIALS',c.basic,'🥪'],['FUN MONEY',c.waste,'✨'],['NET SAVED',c.netFlex,'✈️']].map(x=>`<div class="report-stat"><div class="mini-label">${x[0]}</div><div class="text-lg font-black mt-1">${x[2]} ${fmt(x[1],0)}</div></div>`).join('');document.getElementById('report-pct-text').textContent=`${Math.max(0,pct).toFixed(1)}%`;const bar=document.getElementById('report-bar');bar.style.width=c.netFlex<0?'100%':`${Math.min(100,Math.max(0,pct))}%`;bar.className=c.netFlex<0?'memo-bar-fill bar-warning':'memo-bar-fill';document.getElementById('report-fund-detail').innerHTML=`累積：<strong class="${c.netFlex<0?'text-red-500':''}">${fmt(c.netFlex)}</strong> / 目標：${fmt(b.flex)}`;const bal=c.wasteBudget-c.waste;document.getElementById('report-index-text').innerHTML=bal>=0?`今個月【娛樂與購物】仲有 <strong>${fmt(bal)}</strong>，相等於約 <strong>${(bal/150).toFixed(1)} 張專輯</strong>。🎉`:`今個月娛樂超支 <strong>${fmt(Math.abs(bal))}</strong>，相等於約 <strong>${(Math.abs(bal)/150).toFixed(1)} 張專輯</strong>。💔`;
+  const rows=[['💸 總支出',last.expense,c.expense],['🥪 基本與固定',last.basic,c.basic],['✨ 娛樂購物',last.waste,c.waste],['✈️ 淨彈性儲蓄',last.netFlex,c.netFlex]];document.getElementById('report-mom-table').innerHTML=`<table class="w-full text-sm"><thead><tr><th class="text-left">項目</th><th>上月</th><th>本月</th><th>變化</th></tr></thead><tbody>${rows.map(r=>`<tr><td class="font-black">${r[0]}</td><td class="text-right">${fmt(r[1],0)}</td><td class="text-right">${fmt(r[2],0)}</td><td class="text-right font-black">${r[2]-r[1]>=0?'+':''}${fmt(r[2]-r[1],0)}</td></tr>`).join('')}</tbody></table>`;document.getElementById('report-quote').innerHTML=c.netFlex<0?'「警報！儲蓄畀超支食咗，今個月要收手啦！🚨」':pct>=100?'「大發！本月彈性儲蓄達標，離下次見面又近咗！🎉✨」':pct>=50?'「穩定發揮！守住而家個節奏就得啦。💪」':'「距離目標仲有少少，購物車先冷靜一下啦！🐰」';document.getElementById('report-modal').classList.remove('hidden');lucide.createIcons()}
+function renderAll(){renderDashboard();renderToBuyList();lucide.createIcons()}
+function loadSettingsForm(){document.getElementById('api-url-input').value=apiUrl;document.getElementById('budget-mode').value=budgetConfig.mode;document.getElementById('budget-income').value=budgetConfig.income;document.getElementById('budget-basic-pct').value=budgetConfig.basicPct;document.getElementById('budget-waste-pct').value=budgetConfig.wastePct;document.getElementById('budget-flex-pct').value=budgetConfig.flexPct;document.getElementById('budget-urgent-pct').value=budgetConfig.urgentPct;document.getElementById('budget-basic-fixed').value=budgetConfig.basicFixed;document.getElementById('budget-waste-fixed').value=budgetConfig.wasteFixed;document.getElementById('budget-flex-fixed').value=budgetConfig.flexFixed;document.getElementById('budget-urgent-fixed').value=budgetConfig.urgentFixed;document.getElementById('large-expense-threshold').value=budgetConfig.largeExpenseThreshold;toggleBudgetFields();validatePcts()}
+function toggleBudgetFields(){const percent=document.getElementById('budget-mode').value==='percent';document.getElementById('percent-budget-fields').classList.toggle('hidden',!percent);document.getElementById('fixed-budget-fields').classList.toggle('hidden',percent)}
+function validatePcts(){const total=['budget-basic-pct','budget-waste-pct','budget-flex-pct','budget-urgent-pct'].reduce((s,id)=>s+num(document.getElementById(id).value),0),el=document.getElementById('budget-pct-warning');el.textContent=`目前合計：${total}% ${total===100?'✓':'（建議加埋等於 100%）'}`;el.className=total===100?'text-xs font-black text-slate-600':'text-xs font-black text-red-500'}
+function saveSettings(){apiUrl=document.getElementById('api-url-input').value.trim();if(apiUrl)localStorage.setItem('smartspend_api_url',apiUrl);else localStorage.removeItem('smartspend_api_url');budgetConfig={mode:document.getElementById('budget-mode').value,income:num(document.getElementById('budget-income').value),basicPct:num(document.getElementById('budget-basic-pct').value),wastePct:num(document.getElementById('budget-waste-pct').value),flexPct:num(document.getElementById('budget-flex-pct').value),urgentPct:num(document.getElementById('budget-urgent-pct').value),basicFixed:num(document.getElementById('budget-basic-fixed').value),wasteFixed:num(document.getElementById('budget-waste-fixed').value),flexFixed:num(document.getElementById('budget-flex-fixed').value),urgentFixed:num(document.getElementById('budget-urgent-fixed').value),largeExpenseThreshold:num(document.getElementById('large-expense-threshold').value)};localStorage.setItem('memo_budget_config',JSON.stringify(budgetConfig));document.getElementById('settings-modal').classList.add('hidden');renderAll();showToast('設定已儲存 ✓')}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const applyTheme=()=>{const night=document.documentElement.dataset.theme==='night';document.getElementById('theme-moon')?.classList.toggle('hidden',night);document.getElementById('theme-sun')?.classList.toggle('hidden',!night)};
+  applyTheme();
+  document.getElementById('btn-theme-toggle')?.addEventListener('click',()=>{const next=document.documentElement.dataset.theme==='night'?'day':'night';document.documentElement.dataset.theme=next;localStorage.setItem('memo_theme',next);applyTheme()});
+  document.querySelectorAll('[data-scroll-target]').forEach(btn=>btn.addEventListener('click',()=>document.getElementById(btn.dataset.scrollTarget)?.scrollIntoView({behavior:'smooth',block:'start'})));document.getElementById('btn-open-entry')?.addEventListener('click',()=>openEntryModal(true));document.getElementById('btn-open-entry-mobile')?.addEventListener('click',()=>openEntryModal(true));document.getElementById('btn-close-entry-modal')?.addEventListener('click',()=>{resetEntryForm();closeEntryModal()});document.getElementById('entry-modal')?.addEventListener('click',e=>{if(e.target===e.currentTarget){resetEntryForm();closeEntryModal()}});
+  document.querySelectorAll('[data-open-report]').forEach(btn=>btn.addEventListener('click',()=>generateBattleReport()));migrateToBuy();buildFilterCategories();document.getElementById('tx-date').value=localMonth(new Date());renderCategoryOptions('expense');initMonthSelector();filterDataByMonth();randomizeQuote();renderAll();fetchLiveRates();if(apiUrl)syncFromCloud();else updateSyncStatus(false,'尚未連線');
+  document.querySelectorAll('.type-btn').forEach(b=>b.onclick=()=>setType(b.dataset.type));document.getElementById('tx-amount').oninput=updatePreview;document.getElementById('tx-currency').onchange=updatePreview;document.getElementById('tx-form').onsubmit=handleAddTransaction;document.getElementById('btn-cancel-edit').onclick=()=>{resetEntryForm();closeEntryModal()};
+  document.getElementById('btn-toggle-balance').onclick=()=>{localStorage.setItem('hide_balance',localStorage.getItem('hide_balance')!=='true');renderDashboard()};document.getElementById('btn-open-settings').onclick=()=>{loadSettingsForm();document.getElementById('settings-modal').classList.remove('hidden')};document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.close).classList.add('hidden'));document.getElementById('budget-mode').onchange=toggleBudgetFields;['budget-basic-pct','budget-waste-pct','budget-flex-pct','budget-urgent-pct'].forEach(id=>document.getElementById(id).oninput=validatePcts);document.getElementById('btn-save-settings').onclick=saveSettings;
+  document.getElementById('btn-manual-sync').onclick=()=>{randomizeQuote();syncFromCloud()};document.getElementById('btn-export-csv').onclick=exportToCSV;document.getElementById('btn-duplicate-last').onclick=()=>{const t=transactions[0]||allTransactions[0];if(t)duplicateTx(t.id);else showToast('暫時未有紀錄可以複製')};
+  document.querySelectorAll('.filter-btn').forEach(b=>b.onclick=()=>{currentFilter=b.dataset.filter;document.querySelectorAll('.filter-btn').forEach(x=>x.className='filter-btn memo-btn px-3 py-2');b.className='filter-btn memo-btn bg-memo-border text-white px-3 py-2';renderList()});document.getElementById('tx-search').oninput=e=>{searchTerm=e.target.value.trim().toLowerCase();renderList()};document.getElementById('filter-category').onchange=e=>{categoryFilter=e.target.value;renderList()};document.getElementById('filter-account').onchange=e=>{accountFilter=e.target.value;renderList()};
+  document.getElementById('tobuy-form').onsubmit=addToBuyItem;document.getElementById('btn-close-rollover').onclick=()=>{localStorage.setItem(`rollover_claimed_${getLastMonthString(selectedMonthStr)}`,'true');document.getElementById('rollover-alert').classList.add('hidden')};document.getElementById('btn-claim-gacha').onclick=()=>handleRollover('gacha');document.getElementById('btn-claim-base').onclick=()=>handleRollover('base');
+});
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
 </body>
 </html>
