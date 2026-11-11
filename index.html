@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>My Monthly Memo — Date-first Ledger V4.2</title>
+<title>My Monthly Memo V4.4 — One-time travel</title>
 <link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;🐰&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
 <link href="manifest.json" rel="manifest"/>
 <meta content="#F7F2E8" name="theme-color"/>
@@ -267,8 +267,15 @@
 <!-- FORECAST -->
 <section class="forecast-ticket p-6 sm:p-7">
 <div class="flex items-center justify-between"><div><div class="section-kicker">Month-end forecast</div><h3 class="font-black text-xl mt-1">🔮 月底預測票</h3></div><span class="font-mono text-[10px] text-memo-muted">MMM / FORECAST</span></div>
-<div class="ticket-rule mt-5 pt-5 grid grid-cols-2 md:grid-cols-4 gap-5"><div><div class="mini-label">Days left</div><div class="text-2xl font-black mt-1" id="forecast-days">—</div></div><div><div class="mini-label">Daily avg.</div><div class="text-2xl font-black mt-1" id="forecast-daily">—</div></div><div><div class="mini-label">Month-end spend</div><div class="text-2xl font-black mt-1" id="forecast-expense">—</div></div><div><div class="mini-label">Net flex saving</div><div class="text-2xl font-black mt-1" id="forecast-saving">—</div></div></div>
-<p class="text-xs font-bold text-memo-muted mt-5" id="forecast-comment"></p>
+<div class="ticket-rule mt-5 pt-5 grid grid-cols-2 md:grid-cols-4 gap-5"><div><div class="mini-label">Days left</div><div class="text-2xl font-black mt-1" id="forecast-days">—</div></div><div><div class="mini-label">Regular daily avg.</div><div class="text-2xl font-black mt-1" id="forecast-daily">—</div><div class="text-[10px] font-bold text-memo-muted mt-1">唔包括機票／固定／計劃大額</div></div><div><div class="mini-label">Month-end total expense</div><div class="text-2xl font-black mt-1" id="forecast-expense">—</div></div><div><div class="mini-label">Net flex (recorded)</div><div class="text-2xl font-black mt-1" id="forecast-saving">—</div><div class="text-[10px] font-bold text-memo-muted mt-1">目前已記錄，唔按日數倍增</div></div></div>
+<div class="mt-5 rounded-xl border border-[var(--line)] bg-[var(--paper-3)] p-4 space-y-2">
+  <div class="mini-label mb-2">月底支出點樣計？</div>
+  <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-bold"><span>📅 日常支出預計（按平均推算）</span><strong id="forecast-regular-total">HK$ 0</strong></div>
+  <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-bold"><span>🧾 固定＋一次性支出（全額計一次）</span><strong id="forecast-onetime-total">HK$ 0</strong></div>
+  <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-memo-muted"><span>　當中旅行／機票</span><strong id="forecast-travel-total">HK$ 0</strong></div>
+  <div class="border-t border-dashed border-[var(--line)] pt-2 flex items-center justify-between gap-2 font-black text-sm"><span>＝ 預計月底總支出</span><strong id="forecast-expense-breakdown">HK$ 0</strong></div>
+</div>
+<p class="text-xs font-bold text-memo-muted mt-4" id="forecast-comment"></p>
 </section>
 <!-- LOWER INSIGHTS / QUICK ACTIONS -->
 <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -295,7 +302,7 @@
 <div><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">類型</label><div class="grid grid-cols-2 sm:grid-cols-3 gap-3"><button class="type-btn active memo-btn py-3 text-sm" data-type="expense" type="button">💸 日常支出</button><button class="type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none" data-type="fixed" type="button">📌 固定支出</button><button class="type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none" data-type="planned" type="button">🧾 計劃大額</button><button class="type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none" data-type="income" type="button">💰 入帳</button><button class="type-btn memo-btn py-3 text-sm bg-slate-100 text-slate-400 border-slate-300 shadow-none" data-type="saving" type="button">🐷 儲蓄</button></div><input id="tx-type" type="hidden" value="expense"/><input id="editing-id" type="hidden" value=""/></div>
 <div><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">金額與幣別</label><div class="flex rounded-xl overflow-hidden border border-[var(--line)] bg-[var(--paper-2)] amount-field"><select class="bg-[var(--paper-3)] text-sm font-black px-4 py-3 outline-none border-r border-[var(--line)]" id="tx-currency"><option>HKD</option><option>KRW</option><option>JPY</option><option>USD</option></select><input class="flex-1 min-w-0 bg-transparent px-4 py-3 text-lg font-black outline-none" id="tx-amount" min="0" placeholder="0.00" required="" step="any" type="number"/></div><div class="hidden mt-3 px-4 py-3 bg-[var(--paper-3)] rounded-xl text-xs font-black flex justify-between" id="conversion-preview"><span>折合港幣：</span><span id="preview-hkd-val">HK$ 0.00</span></div></div>
 <div class="flex gap-3"><div class="flex-1 min-w-0"><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">分類</label><select class="memo-input" id="tx-category"></select></div><div class="w-[145px] shrink-0"><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">實際發生日期</label><input class="memo-input px-2" id="tx-date" required="" type="date"/></div></div>
-<div class="planned-source hidden" id="planned-source-wrap"><div class="mini-label mb-2">大額支出資金來源</div><select class="memo-input" id="planned-source"><option value="本月現金">本月現金／帳面餘額</option><option value="彈性儲蓄">彈性儲蓄</option><option value="Carry Forward">Carry Forward 娛樂結餘</option><option value="其他預留資金">其他預留資金</option></select><p class="text-[10px] font-bold text-memo-muted mt-2">計劃性大額支出唔會直接打爆娛樂與購物預算；只有選「彈性儲蓄」時先會扣減彈性儲蓄淨額。</p></div>
+<div class="planned-source hidden" id="planned-source-wrap"><div class="mini-label mb-2">大額支出資金來源</div><select class="memo-input" id="planned-source"><option value="本月現金">本月現金／帳面餘額</option><option value="彈性儲蓄">彈性儲蓄</option><option value="Carry Forward">Carry Forward 娛樂結餘</option><option value="其他預留資金">其他預留資金</option></select><p class="text-[10px] font-bold text-memo-muted mt-2">計劃性大額（包括旅行／機票）按你選擇嘅交易日期一次過計入本月支出；月底預測只會計一次，唔會攤分或重複外推。只有選「彈性儲蓄」時先會扣減彈性儲蓄淨額，亦唔會直接打爆娛樂預算。</p></div>
 <div class="flex flex-col sm:flex-row gap-4"><div class="sm:w-[160px] shrink-0"><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">支付方式</label><select class="memo-input" id="tx-account"><option value="信用卡">信用卡</option><option value="現金">現金</option><option value="銀行轉帳">銀行轉帳/FPS</option><option value="八達通/電子錢包">八達通/PayMe</option></select></div><div class="flex-1"><label class="block text-xs font-black mb-2 text-memo-muted uppercase tracking-wider">備註說明</label><input class="memo-input" id="tx-note" placeholder="例如：買了金容仙新專..." type="text"/></div></div>
 <button class="w-full memo-btn bg-memo-border text-white text-base py-4" id="btn-submit" type="submit"><span id="btn-submit-text">✓ 幫我入帳！</span></button>
 </form>
@@ -398,16 +405,48 @@ function renderRollover(){document.getElementById('rollover-alert')?.classList.a
 function computeMonth(month=selectedMonthStr){
   const arr=allTransactions.filter(t=>t?.date?.startsWith(month));
   let expense=0,income=0,saving=0,basic=0,waste=0,planned=0,flex=0,urgent=0,plannedFlexDraw=0,plannedCarryDraw=0;
+  let oneTimeExpense=0,oneTimeTravel=0; // 已記錄一次性及固定：每月計一次，唔按日平均外推
   const byCat={};
   arr.forEach(t=>{
     const a=num(t.amountHKD);
-    if(t.type==='expense'||t.type==='fixed'){expense+=a;byCat[t.category]=(byCat[t.category]||0)+a;if(isBasicCategory(t.category)||t.type==='fixed')basic+=a;if(wasteCats.includes(t.category))waste+=a}
-    else if(t.type==='planned'){expense+=a;planned+=a;byCat[t.category]=(byCat[t.category]||0)+a;if(t.plannedSource==='彈性儲蓄')plannedFlexDraw+=a;if(t.plannedSource==='Carry Forward')plannedCarryDraw+=a}
+    if(t.type==='expense'||t.type==='fixed'){
+      expense+=a;
+      byCat[t.category]=(byCat[t.category]||0)+a;
+      if(isBasicCategory(t.category)||t.type==='fixed')basic+=a;
+      if(wasteCats.includes(t.category))waste+=a;
+      // 舊紀錄可能以日常／固定類型儲存機票：都要一筆過計，唔會攤成每日重複開支。
+      if(t.type==='fixed'||fixedCats.includes(t.category)||categories.planned.includes(t.category))oneTimeExpense+=a;
+      if(t.category==='旅行/機票')oneTimeTravel+=a;
+    }
+    else if(t.type==='planned'){
+      expense+=a;planned+=a;
+      oneTimeExpense+=a;
+      if(t.category==='旅行/機票')oneTimeTravel+=a;
+      byCat[t.category]=(byCat[t.category]||0)+a;
+      if(t.plannedSource==='彈性儲蓄')plannedFlexDraw+=a;
+      if(t.plannedSource==='Carry Forward')plannedCarryDraw+=a;
+    }
     else if(t.type==='income')income+=a;
     else if(t.type==='saving'){saving+=a;if(t.category==='緊急醫療備用')urgent+=a;else flex+=a}
   });
   const b=getBudgetTargets(),carryRaw=getCarry(month),carry=Math.max(0,carryRaw-plannedCarryDraw),softBuffer=b.waste*num(budgetConfig.funBufferPct)/100,funCoreBudget=b.waste+carry,wasteBudget=funCoreBudget+softBuffer,basicOver=Math.max(0,basic-b.basic),wasteOver=Math.max(0,waste-wasteBudget),netFlex=flex-basicOver-wasteOver-plannedFlexDraw;
-  return{arr,expense,income,saving,basic,waste,planned,flex,urgent,byCat,carryRaw,carry,plannedCarryDraw,plannedFlexDraw,savingSpent:plannedFlexDraw,savingNetChange:saving-plannedFlexDraw,softBuffer,funCoreBudget,wasteBudget,basicOver,wasteOver,netFlex,balance:income-expense-saving}
+  return{arr,expense,income,saving,basic,waste,planned,flex,urgent,byCat,oneTimeExpense,oneTimeTravel,carryRaw,carry,plannedCarryDraw,plannedFlexDraw,savingSpent:plannedFlexDraw,savingNetChange:saving-plannedFlexDraw,softBuffer,funCoreBudget,wasteBudget,basicOver,wasteOver,netFlex,balance:income-expense-saving}
+}
+
+// 真正日常消費先用日均外推；機票、其他計劃大額、固定支出按記錄月份一次過加入。
+function calculateMonthEndExpenseForecast(c,meta){
+  const regularExpense=Math.max(0,c.expense-c.oneTimeExpense);
+  const elapsed=Math.max(1,meta.elapsed);
+  const regularDailyAverage=meta.isFuture?null:regularExpense/(meta.isCurrent?elapsed:Math.max(1,meta.days));
+  const projectedRegular=meta.isCurrent?regularDailyAverage*meta.days:regularExpense;
+  return {
+    regularExpense,
+    regularDailyAverage,
+    projectedRegular,
+    oneTimeExpense:c.oneTimeExpense,
+    oneTimeTravel:c.oneTimeTravel,
+    total:projectedRegular+c.oneTimeExpense
+  };
 }
 
 function setType(type,selectedCat){
@@ -537,7 +576,19 @@ function renderDashboard(){
   const flexPct=b.flex>0?c.netFlex/b.flex*100:0,fb=document.getElementById('flex-bar');fb.style.width=c.netFlex<0?'100%':`${Math.min(100,Math.max(0,flexPct))}%`;fb.className=c.netFlex<0?'memo-bar-fill bar-warning':'memo-bar-fill';document.getElementById('flex-remaining').innerHTML=c.netFlex<0?`預算後 <span class="text-red-500">${fmt(c.netFlex,0)}</span>`:`預算後 ${fmt(c.netFlex,0)}`;document.getElementById('flex-ratio').textContent=`${num(Math.max(0,c.netFlex)).toLocaleString()} / ${num(b.flex).toLocaleString()} HKD`;document.getElementById('flex-status-text').textContent='食飽飽先有力追星 ✈️';
   setBar('urgent',c.urgent,b.urgent,['安全網建立中','保命金已過半 🧱','保命金達標 🛡️']);
   document.getElementById('basic-remaining').textContent=`仲可以洗 ${fmt(Math.max(0,b.basic-c.basic),0)}`;document.getElementById('gacha-remaining').textContent=`仲可以洗 ${fmt(Math.max(0,c.wasteBudget-c.waste),0)}`;document.getElementById('urgent-remaining').textContent=`距離目標 ${fmt(Math.max(0,b.urgent-c.urgent),0)}`;
-  const elapsed=Math.max(1,meta.elapsed),projectExpense=meta.isFuture?0:meta.isCurrent?c.expense/elapsed*meta.days:c.expense,projectSaving=meta.isFuture?0:meta.isCurrent?c.netFlex/elapsed*meta.days:c.netFlex;document.getElementById('forecast-days').textContent=meta.isCurrent?`${meta.remaining} 日`:meta.isFuture?`${meta.days} 日`:'已完結';document.getElementById('forecast-daily').textContent=meta.isFuture?'—':fmt(c.expense/elapsed,0);document.getElementById('forecast-expense').textContent=fmt(projectExpense,0);document.getElementById('forecast-saving').textContent=fmt(projectSaving,0);document.getElementById('forecast-comment').textContent=meta.isCurrent?(projectExpense<=b.basic+c.wasteBudget?'照目前速度，整體消費仍在主要支出彈性範圍內。':'照目前速度，月底可能超過基本＋娛樂真正超支線。'):(meta.isFuture?'未到呢個月份，暫時唔做預測。':'呢個月已完結，所以顯示實際結果。');
+  const forecast=calculateMonthEndExpenseForecast(c,meta);
+  document.getElementById('forecast-days').textContent=meta.isCurrent?`${meta.remaining} 日`:meta.isFuture?`${meta.days} 日`:'已完結';
+  document.getElementById('forecast-daily').textContent=forecast.regularDailyAverage===null?'—':fmt(forecast.regularDailyAverage,0);
+  document.getElementById('forecast-expense').textContent=fmt(forecast.total,0);
+  document.getElementById('forecast-saving').textContent=fmt(c.netFlex,0);
+  document.getElementById('forecast-regular-total').textContent=fmt(forecast.projectedRegular,0);
+  document.getElementById('forecast-onetime-total').textContent=fmt(forecast.oneTimeExpense,0);
+  document.getElementById('forecast-travel-total').textContent=fmt(forecast.oneTimeTravel,0);
+  document.getElementById('forecast-expense-breakdown').textContent=fmt(forecast.total,0);
+  document.getElementById('forecast-comment').textContent=meta.isCurrent
+    ?'月底預測只按日常支出趨勢推算；旅行／機票、固定費同計劃大額已全額計入一次，唔會按日數重複放大。'
+    :meta.isFuture?'未到呢個月份：暫時只計入已記錄嘅支出，唔預估未來每日消費。'
+    :'月份已完結：顯示實際總支出，包括當月旅行／機票及其他一次性開支。';
   const basicLeft=Math.max(0,b.basic-c.basic),wasteLeft=Math.max(0,c.wasteBudget-c.waste),dailySpendPool=basicLeft+wasteLeft;
   const daysForSafe=meta.isCurrent?meta.remaining+1:meta.isFuture?meta.days:0;
   document.getElementById('safe-basic-left').textContent=fmt(basicLeft,0);
