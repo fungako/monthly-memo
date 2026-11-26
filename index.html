@@ -177,6 +177,17 @@
     .salary-flow-legend:before{content:"";width:9px;height:9px;border-radius:50%;background:var(--blush)}
     .salary-flow-legend.saved:before{background:var(--blue)}
     @media(max-width:600px){.salary-flow-main{grid-template-columns:1fr}.salary-flow{padding:1rem}}
+
+    /* V4.6 rolling unallocated funds — NOT the discretionary budget Carry chip */
+    .buffer-recap{margin-top:1rem;padding:1rem;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--blue) 10%,var(--paper-2))}
+    .buffer-recap-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.85rem}
+    .buffer-number{font-weight:900;font-size:clamp(1.15rem,2.5vw,1.65rem);font-variant-numeric:tabular-nums;overflow-wrap:anywhere;margin-top:.3rem}
+    .buffer-number.negative{color:var(--coral)}
+    .buffer-number.positive{color:var(--success)}
+    .buffer-recap .mini-label{line-height:1.6}
+    .buffer-history-row{display:flex;justify-content:space-between;gap:.75rem;font-size:.76rem;font-weight:800;padding:.35rem 0}
+    .buffer-history-row+ .buffer-history-row{border-top:1px dashed var(--line)}
+    @media(max-width:600px){.buffer-recap-grid{grid-template-columns:1fr}.buffer-recap-grid>div{padding-bottom:.65rem;border-bottom:1px dashed var(--line)}.buffer-recap-grid>div:last-child{border-bottom:none;padding-bottom:0}}
   </style>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('memo_theme')||'day'}catch(e){}</script>
 </head>
@@ -260,6 +271,23 @@
         <div class="salary-flow-number" id="salary-left">HK$ 0.00</div>
         <p class="text-[11px] font-bold text-memo-muted" id="salary-left-note">只用本月收入計，唔計上月結餘；未扣未來帳單。</p>
       </div>
+    </div>
+    <div class="buffer-recap" aria-label="跨月累積結餘同本月可用金額">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div><div class="mini-label">Rolling unallocated balance</div><h4 class="font-black text-base mt-1">🧺 跨月累積彈性結餘</h4></div>
+        <span class="tag-pill text-[10px] font-black">按實際記帳推算</span>
+      </div>
+      <div class="buffer-recap-grid">
+        <div><div class="mini-label">截至上月底留低（不包括已儲入）</div><div class="buffer-number" id="buffer-previous">HK$ 0.00</div></div>
+        <div><div class="mini-label">＋ 本月收入扣除支出及儲蓄</div><div class="buffer-number" id="buffer-current">HK$ 0.00</div></div>
+        <div><div class="mini-label">＝ 本月累積未分配結餘</div><div class="buffer-number positive" id="buffer-total">HK$ 0.00</div></div>
+      </div>
+      <p class="actual-footnote" id="buffer-message">只加總已記錄月份嘅收入減支出減新儲蓄；唔會將娛樂 Carry、Soft Buffer 或未用預算再次當成現金。</p>
+      <details class="money-calc-details mt-2">
+        <summary>查看之前月份點樣累積</summary>
+        <div id="buffer-history-list" class="pb-2"></div>
+        <p class="actual-footnote mb-2">只計現有交易紀錄；未包括記帳開始前嘅開戶餘額、未記錄轉帳、信用卡應付款或實際銀行戶口結餘。若資金已移到其他地方但冇入帳，呢個數字會偏高。</p>
+      </details>
     </div>
     <div class="mt-4">
       <div class="salary-allocation-bar" role="img" aria-label="支出與儲蓄佔已分配總額比例"><div class="spent" id="salary-spent-bar" style="width:0%"></div><div class="saved" id="salary-saved-bar" style="width:0%"></div></div>
@@ -598,6 +626,21 @@ function incomeHidden(){
   return explicit===null?localStorage.getItem('hide_balance')==='true':explicit==='true';
 }
 
+// V4.6: cumulative *recorded* money not spent or newly saved by the end of the previous month.
+// Unlike fun_carry / gacha_bonus, this is a money-flow estimate and is NEVER added to any budget allowance.
+function calculateRollingBuffer(month=selectedMonthStr){
+  const pastMonths=[...new Set(allTransactions
+    .filter(t=>t?.date && /^\d{4}-\d{2}/.test(t.date) && t.date.slice(0,7)<month)
+    .map(t=>t.date.slice(0,7)))].sort();
+  const history=pastMonths.map(m=>{
+    const c=computeMonth(m);
+    return {month:m,income:c.income,expense:c.expense,saving:c.saving,net:c.income-c.expense-c.saving};
+  });
+  // IMPORTANT: retain negative prior months too; never pretend past deficits disappeared.
+  const previous=Math.round(history.reduce((sum,x)=>sum+x.net,0)*100)/100;
+  return {previous,history};
+}
+
 function renderDashboard(){
   const c=computeMonth(),b=getBudgetTargets(),meta=getMonthMeta(selectedMonthStr),hideIncome=incomeHidden();
   const [hy,hm]=selectedMonthStr.split('-').map(Number);
@@ -623,6 +666,25 @@ function renderDashboard(){
   salaryLeftElement.textContent=hideIncome?'HK$ •••••':fmt(salaryLeft);
   salaryLeftElement.classList.toggle('negative',!hideIncome&&salaryLeft<0);
   salaryLeftElement.classList.toggle('positive',!hideIncome&&salaryLeft>=0);
+  // Previous months' accumulated remainder can support this month, but stays separate
+  // from the salary-only number above. Privacy hides any amount that can reveal income.
+  const rolling=calculateRollingBuffer(selectedMonthStr);
+  const rollingTotal=Math.round((rolling.previous+salaryLeft)*100)/100;
+  const privateMoney=value=>hideIncome?'HK$ •••••':fmt(value);
+  for(const [id,value] of [['buffer-previous',rolling.previous],['buffer-current',salaryLeft],['buffer-total',rollingTotal]]){
+    const el=document.getElementById(id);
+    el.textContent=privateMoney(value);
+    el.classList.toggle('negative',!hideIncome&&value<0);
+    el.classList.toggle('positive',!hideIncome&&value>=0);
+  }
+  document.getElementById('buffer-message').textContent=hideIncome
+    ?'收入私隱模式已開啟；跨月結餘一併隱藏。'
+    :rollingTotal<0
+      ?'累積結餘已低過零：記帳總分配多過已記錄收入，可能涉及舊儲蓄、開戶結餘或漏記資金；唔代表銀行實際透支。'
+      :'呢筆係截至所選月份嘅累積未分配結餘，已扣除各月實際支出同新儲蓄；未扣未來帳單，亦唔等於銀行實際結餘。';
+  document.getElementById('buffer-history-list').innerHTML=rolling.history.length
+    ? rolling.history.map(h=>`<div class="buffer-history-row"><span>${h.month.replace('-',' / ')} · 收入 − 支出 − 儲蓄</span><strong>${hideIncome?'HK$ •••••':fmt(h.net)}</strong></div>`).join('')
+    : '<p class="actual-footnote">冇所選月份之前嘅交易紀錄；上月累積結餘暫當 HK$0。</p>';
   document.getElementById('salary-left-note').textContent=hideIncome?'收入已隱藏；按收入卡片嘅顯示按鈕可查看餘額。':salaryLeft<0?'本月已分配超過收入；差額可能來自上月結餘或舊儲蓄。':'呢筆係本月收入扣減後尚餘，未扣未來帳單。';
   document.getElementById('salary-spent-bar').style.width=`${salarySpendShare}%`;
   document.getElementById('salary-saved-bar').style.width=`${salaryAllocated>0?100-salarySpendShare:0}%`;
