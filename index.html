@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>My Monthly Memo V4.4 — One-time travel</title>
+<title>My Monthly Memo V4.5 — Salary Flow</title>
 <link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text y=%22.9em%22 font-size=%2290%22&gt;🐰&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>
 <link href="manifest.json" rel="manifest"/>
 <meta content="#F7F2E8" name="theme-color"/>
@@ -161,6 +161,22 @@
     .saving-net-negative{color:var(--coral)}
     .budget-guide{border:1px solid var(--line);border-radius:15px;background:var(--paper-2);padding:0 18px;box-shadow:0 3px 12px var(--shadow)}
     @media(max-width:767px){.actual-flow-card{padding:1.1rem}.actual-money{font-size:2rem;margin-bottom:.7rem}.actual-flow-rule{margin-top:.45rem}}
+
+    /* V4.5 salary-based spending ceiling: actual recorded cash flow, no budget assumptions */
+    .salary-flow{background:linear-gradient(135deg,var(--paper-2),color-mix(in srgb,var(--butter) 24%,var(--paper-2)));border:1.5px solid var(--line);border-radius:20px;padding:1.3rem;box-shadow:0 6px 22px var(--shadow)}
+    .salary-flow-main{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .salary-flow-metric{background:var(--paper-2);border:1px solid var(--line);border-radius:15px;padding:1rem;min-width:0}
+    .salary-flow-metric.primary{background:color-mix(in srgb,var(--sage) 17%,var(--paper-2))}
+    .salary-flow-number{font-weight:900;font-size:clamp(1.45rem,3.2vw,2.25rem);line-height:1.2;letter-spacing:-.04em;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;margin:.45rem 0}
+    .salary-flow-number.negative{color:var(--coral)}
+    .salary-flow-number.positive{color:var(--success)}
+    .salary-allocation-bar{display:flex;width:100%;height:13px;background:var(--paper-3);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+    .salary-allocation-bar>.spent{background:var(--blush)}
+    .salary-allocation-bar>.saved{background:var(--blue)}
+    .salary-flow-legend{display:inline-flex;align-items:center;gap:5px;font-size:.73rem;font-weight:800}
+    .salary-flow-legend:before{content:"";width:9px;height:9px;border-radius:50%;background:var(--blush)}
+    .salary-flow-legend.saved:before{background:var(--blue)}
+    @media(max-width:600px){.salary-flow-main{grid-template-columns:1fr}.salary-flow{padding:1rem}}
   </style>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('memo_theme')||'day'}catch(e){}</script>
 </head>
@@ -195,7 +211,7 @@
   <div class="mb-3">
     <div class="flex flex-wrap items-center gap-2 mb-2"><span class="section-kicker" id="hero-month">NOVEMBER 2026</span><span class="tag-pill text-[10px] font-black" id="hero-days">— DAYS LEFT</span></div>
     <h2 class="text-2xl font-black mt-1" id="actual-heading">本月實際收支</h2>
-    <p class="text-sm font-bold text-memo-muted mt-1">只按你真正記錄咗嘅收入、支出同儲蓄計算，<strong>唔使用預算目標估算餘額。</strong></p>
+    <p class="text-sm font-bold text-memo-muted mt-1">用實際記錄計出「已使＋已儲」同「本月收入仲剩幾多」，<strong>唔使用預算目標估算。</strong></p>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 actual-flow-grid">
     <article class="actual-flow-card actual-expense">
@@ -226,6 +242,38 @@
       <p class="actual-footnote">Privacy 按鈕只影響收入顯示，唔會遮住支出同儲蓄。</p>
     </article>
   </div>
+  <section class="salary-flow" aria-label="本月薪金分配與可再支出金額">
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+      <div><div class="section-kicker">Monthly salary allocation</div><h3 class="text-lg sm:text-xl font-black mt-1">🧮 本月薪金仲剩幾多？</h3></div>
+      <span class="tag-pill text-[10px] font-black">實際紀錄 · 非預算推算</span>
+    </div>
+    <div class="salary-flow-main">
+      <div class="salary-flow-metric">
+        <div class="mini-label">Spent + newly saved</div>
+        <h4 class="font-black text-sm mt-1">💸 本月已用＋已儲</h4>
+        <div class="salary-flow-number" id="salary-allocated">HK$ 0.00</div>
+        <p class="text-[11px] font-bold text-memo-muted">本月實際支出 ＋ 本月新儲入嘅金額</p>
+      </div>
+      <div class="salary-flow-metric primary">
+        <div class="mini-label">Left from this month's income</div>
+        <h4 class="font-black text-sm mt-1">🪙 本月收入扣除後仲剩</h4>
+        <div class="salary-flow-number" id="salary-left">HK$ 0.00</div>
+        <p class="text-[11px] font-bold text-memo-muted" id="salary-left-note">只用本月收入計，唔計上月結餘；未扣未來帳單。</p>
+      </div>
+    </div>
+    <div class="mt-4">
+      <div class="salary-allocation-bar" role="img" aria-label="支出與儲蓄佔已分配總額比例"><div class="spent" id="salary-spent-bar" style="width:0%"></div><div class="saved" id="salary-saved-bar" style="width:0%"></div></div>
+      <div class="flex flex-wrap gap-x-5 gap-y-1 mt-2"><span class="salary-flow-legend">支出 <strong id="salary-spent-share">0%</strong></span><span class="salary-flow-legend saved">新儲入 <strong id="salary-saved-share">0%</strong></span></div>
+    </div>
+    <details class="money-calc-details mt-3">
+      <summary>查看計算方法</summary>
+      <div class="money-breakdown-row"><span>💰 本月收入</span><strong id="salary-detail-income">HK$ 0.00</strong></div>
+      <div class="money-breakdown-row"><span>− 本月實際支出</span><strong id="salary-detail-expense">HK$ 0.00</strong></div>
+      <div class="money-breakdown-row"><span>− 本月新儲入</span><strong id="salary-detail-saving">HK$ 0.00</strong></div>
+      <div class="money-breakdown-row border-t border-dashed border-[var(--line)]"><span>＝ 本月收入扣除後餘額</span><strong id="salary-detail-left">HK$ 0.00</strong></div>
+      <p class="actual-footnote mb-4">即使由以前月份嘅儲蓄／結餘支付，支出都會計入本月總支出；所以負數代表本月已用／已儲多過本月收入，唔一定代表銀行戶口透支。動用儲蓄金額只作儲蓄淨變動參考，唔會再額外加進支出。</p>
+    </details>
+  </section>
   <p class="actual-flow-explain">* 「由儲蓄付款」目前根據「計劃大額 → 資金來源：彈性儲蓄」統計。呢啲購物已包含喺總支出，唔會重複加數。</p>
 </section>
 <!-- BUDGET ENVELOPES / guidance only -->
@@ -565,6 +613,25 @@ function renderDashboard(){
   document.getElementById('stat-saving-net').textContent=fmt(c.savingNetChange);
   document.getElementById('stat-saving-net').classList.toggle('saving-net-negative',c.savingNetChange<0);
   document.getElementById('saving-net-label').textContent=c.savingNetChange<0?'＝ 本月儲蓄淨減少':'＝ 本月儲蓄淨增加';
+  // Salary-only comparison: new saving transfers count as allocated funds,
+  // but a savings-funded purchase is already in expense and must not be added again.
+  const salaryAllocated=c.expense+c.saving;
+  const salaryLeft=c.income-salaryAllocated;
+  const salarySpendShare=salaryAllocated>0?c.expense/salaryAllocated*100:0;
+  document.getElementById('salary-allocated').textContent=fmt(salaryAllocated);
+  const salaryLeftElement=document.getElementById('salary-left');
+  salaryLeftElement.textContent=hideIncome?'HK$ •••••':fmt(salaryLeft);
+  salaryLeftElement.classList.toggle('negative',!hideIncome&&salaryLeft<0);
+  salaryLeftElement.classList.toggle('positive',!hideIncome&&salaryLeft>=0);
+  document.getElementById('salary-left-note').textContent=hideIncome?'收入已隱藏；按收入卡片嘅顯示按鈕可查看餘額。':salaryLeft<0?'本月已分配超過收入；差額可能來自上月結餘或舊儲蓄。':'呢筆係本月收入扣減後尚餘，未扣未來帳單。';
+  document.getElementById('salary-spent-bar').style.width=`${salarySpendShare}%`;
+  document.getElementById('salary-saved-bar').style.width=`${salaryAllocated>0?100-salarySpendShare:0}%`;
+  document.getElementById('salary-spent-share').textContent=`${salarySpendShare.toFixed(0)}%`;
+  document.getElementById('salary-saved-share').textContent=`${(salaryAllocated>0?100-salarySpendShare:0).toFixed(0)}%`;
+  document.getElementById('salary-detail-income').textContent=hideIncome?'HK$ •••••':fmt(c.income);
+  document.getElementById('salary-detail-expense').textContent=`− ${fmt(c.expense)}`;
+  document.getElementById('salary-detail-saving').textContent=`− ${fmt(c.saving)}`;
+  document.getElementById('salary-detail-left').textContent=hideIncome?'HK$ •••••':fmt(salaryLeft);
   document.getElementById('stat-income').textContent=hideIncome?'HK$ •••••':fmt(c.income);
   document.getElementById('icon-eye').classList.toggle('hidden',hideIncome);
   document.getElementById('icon-eye-off').classList.toggle('hidden',!hideIncome);
